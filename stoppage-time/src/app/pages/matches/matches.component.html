@@ -4,7 +4,7 @@
   <app-controls 
     (searchEvent)="onSearch($event)" 
     (refreshEvent)="loadMatches()">
-    <div filterControls>
+    <div filterControls class="filter-controls">
       <div class="filter-select">
         <label for="filterType">Filtrar por</label>
         <select id="filterType" [(ngModel)]="filterType" (change)="applyFilters()">

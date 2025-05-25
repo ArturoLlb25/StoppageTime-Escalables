@@ -24,6 +24,10 @@
   color: var(--color-accent);
 }
 
+.material-icons.azul {
+  color: var(--color-accent);
+}
+
 .material-icons.today {
   color: var(--color-secondary);
 }
@@ -113,6 +117,12 @@
   border-radius: var(--border-radius-sm);
   background-color: white;
   min-width: 150px;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 .pagination {

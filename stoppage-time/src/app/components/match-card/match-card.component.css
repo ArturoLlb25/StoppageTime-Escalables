@@ -8,6 +8,7 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  height: 170px;
 }
 
 .match-card:hover {
@@ -17,6 +18,10 @@
 
 .match-card.live {
   border-left: 4px solid var(--color-accent);
+}
+
+.match-card.azul {
+  border-left: 4px solid var(--color-secondary);
 }
 
 .match-status {
