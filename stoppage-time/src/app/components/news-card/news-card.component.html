@@ -1,0 +1,18 @@
+<div class="news-card" [routerLink]="['/news', news.id]">
+  <div class="news-image">
+    <img [src]="news.image || 'assets/images/placeholder.jpg'" [alt]="news.title">
+    <div class="news-tags" *ngIf="news.tags && news.tags.length > 0">
+      <span class="tag" *ngFor="let tag of getDisplayTags()">{{tag}}</span>
+    </div>
+  </div>
+  
+  <div class="news-content">
+    <h3 class="news-title">{{news.title}}</h3>
+    <p class="news-summary">{{news.summary}}</p>
+    
+    <div class="news-meta">
+      <span class="news-author">Por {{news.author}}</span>
+      <span class="news-date">{{news.publishDate | date:'dd/MM/yyyy'}}</span>
+    </div>
+  </div>
+</div>

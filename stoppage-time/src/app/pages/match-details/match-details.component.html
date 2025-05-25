@@ -1,0 +1,181 @@
+<div class="container" *ngIf="match">
+  <div class="match-header">
+    <div class="match-league">
+      <img [src]="match.league.logo || 'assets/images/placeholder.jpg'" [alt]="match.league.name" class="league-logo">
+      <span>{{match.league.name}} - {{match.league.country}}</span>
+    </div>
+    
+    <div class="match-status">
+      <span class="status-indicator" [class]="getStatusClass()">
+        <span class="material-icons" *ngIf="match.status === 'LIVE'">fiber_manual_record</span>
+        {{getStatusText()}}
+      </span>
+    </div>
+  </div>
+  
+  <div class="match-details-card glass-card-dark">
+    <div class="match-teams">
+      <div class="team home-team">
+        <img [src]="match.homeTeam.logo || 'assets/images/placeholder.jpg'" [alt]="match.homeTeam.name" class="team-logo">
+        <h2 class="team-name">{{match.homeTeam.name}}</h2>
+      </div>
+      
+      <div class="match-score">
+        <div class="score-container">
+          <span class="score-value">{{match.score?.home || 0}}</span>
+          <span class="score-separator">-</span>
+          <span class="score-value">{{match.score?.away || 0}}</span>
+        </div>
+        <div class="match-time">
+          <span *ngIf="match.status === 'SCHEDULED'">{{formatMatchDate()}}</span>
+          <span *ngIf="match.status === 'LIVE'" class="live-indicator">En vivo</span>
+          <span *ngIf="match.status === 'FINISHED'">Finalizado</span>
+        </div>
+      </div>
+      
+      <div class="team away-team">
+        <img [src]="match.awayTeam.logo || 'assets/images/placeholder.jpg'" [alt]="match.awayTeam.name" class="team-logo">
+        <h2 class="team-name">{{match.awayTeam.name}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="match-content">
+    <div class="tabs-container">
+      <div class="tabs-nav">
+        <div 
+          *ngFor="let tab of tabs; let i = index" 
+          class="tab-item" 
+          [class.active]="activeTabIndex === i"
+          (click)="setActiveTab(i)">
+          {{tab}}
+        </div>
+      </div>
+      
+      <div class="tab-content">
+        <!-- Estadísticas -->
+        <div class="tab-pane" [class.active]="activeTabIndex === 0">
+          <div class="statistics-container" *ngIf="statistics.length > 0; else noStatistics">
+            <div class="stat-item" *ngFor="let stat of statistics">
+              <div class="stat-home">{{stat.home}}</div>
+              <div class="stat-label">{{stat.label}}</div>
+              <div class="stat-away">{{stat.away}}</div>
+              <div class="stat-bar">
+                <div class="stat-bar-home" [style.width.%]="stat.homePercentage"></div>
+                <div class="stat-bar-away" [style.width.%]="stat.awayPercentage"></div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noStatistics>
+            <div class="no-data">
+              <p>No hay estadísticas disponibles para este partido</p>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Alineaciones -->
+        <div class="tab-pane" [class.active]="activeTabIndex === 1">
+          <div class="lineups-container" *ngIf="hasLineups; else noLineups">
+            <div class="lineup-section">
+              <h3>{{match.homeTeam.name}} - Titulares</h3>
+              <div class="players-list">
+                <div class="player-item" *ngFor="let player of homeLineup">
+                  <span class="player-number">{{player.number}}</span>
+                  <span class="player-name">{{player.name}}</span>
+                  <span class="player-position">{{player.position}}</span>
+                  <span class="player-captain" *ngIf="player.isCaptain">(C)</span>
+                </div>
+              </div>
+              
+              <h3>Suplentes</h3>
+              <div class="players-list subs">
+                <div class="player-item" *ngFor="let player of homeSubs">
+                  <span class="player-number">{{player.number}}</span>
+                  <span class="player-name">{{player.name}}</span>
+                  <span class="player-position">{{player.position}}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="lineup-section">
+              <h3>{{match.awayTeam.name}} - Titulares</h3>
+              <div class="players-list">
+                <div class="player-item" *ngFor="let player of awayLineup">
+                  <span class="player-number">{{player.number}}</span>
+                  <span class="player-name">{{player.name}}</span>
+                  <span class="player-position">{{player.position}}</span>
+                  <span class="player-captain" *ngIf="player.isCaptain">(C)</span>
+                </div>
+              </div>
+              
+              <h3>Suplentes</h3>
+              <div class="players-list subs">
+                <div class="player-item" *ngFor="let player of awaySubs">
+                  <span class="player-number">{{player.number}}</span>
+                  <span class="player-name">{{player.name}}</span>
+                  <span class="player-position">{{player.position}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noLineups>
+            <div class="no-data">
+              <p>Las alineaciones aún no están disponibles</p>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Eventos -->
+        <div class="tab-pane" [class.active]="activeTabIndex === 2">
+          <div class="events-timeline" *ngIf="events.length > 0; else noEvents">
+            <div class="event-item" *ngFor="let event of events" [class]="event.type">
+              <div class="event-time">{{event.minute}}'</div>
+              <div class="event-icon">
+                <span class="material-icons" *ngIf="event.type === 'goal'">sports_soccer</span>
+                <span class="material-icons card-icon" 
+                      *ngIf="event.type === 'card'" 
+                      [class.yellow]="isCardEvent(event) && event.detail.type === 'yellow'" 
+                      [class.red]="isCardEvent(event) && event.detail.type === 'red'">
+                  square
+                </span>
+                <span class="material-icons" *ngIf="event.type === 'substitution'">swap_horiz</span>
+              </div>
+              <div class="event-details">
+                <div *ngIf="isGoalEvent(event)">
+                  <strong>GOL</strong> - {{getTeamNameById(event.detail.teamId)}}<br>
+                  {{event.detail.player}}
+                </div>
+                <div *ngIf="isCardEvent(event)">
+                  <strong>{{event.detail.type === 'yellow' ? 'AMARILLA' : 'ROJA'}}</strong> - {{getTeamNameById(event.detail.teamId)}}<br>
+                  {{event.detail.player}}
+                </div>
+                <div *ngIf="isSubstitutionEvent(event)">
+                  <strong>CAMBIO</strong> - {{getTeamNameById(event.detail.teamId)}}<br>
+                  Entra: {{event.detail.playerIn}}<br>
+                  Sale: {{event.detail.playerOut}}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noEvents>
+            <div class="no-data">
+              <p>No hay eventos registrados para este partido</p>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Comentarios -->
+        <div class="tab-pane" [class.active]="activeTabIndex === 3">
+          <app-comments-section [newsId]="'match-' + match.id"></app-comments-section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-container" *ngIf="!match">
+  <div class="spinner"></div>
+</div>

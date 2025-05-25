@@ -1,0 +1,142 @@
+<div class="container">
+  <h1 class="page-title">Noticias Deportivas</h1>
+  
+  <app-controls 
+    (searchEvent)="onSearch($event)" 
+    (refreshEvent)="loadNews()">
+    <div filterControls>
+      <div class="filter-select">
+        <label for="selectedCategory">Categoría</label>
+        <select id="selectedCategory" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+          <option value="all">Todas</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{category}}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-select">
+        <label for="sortBy">Ordenar por</label>
+        <select id="sortBy" [(ngModel)]="sortBy" (change)="applyFilters()">
+          <option value="newest">Más recientes</option>
+          <option value="oldest">Más antiguas</option>
+        </select>
+      </div>
+    </div>
+    
+    <div actionControls *ngIf="isAdmin">
+      <button class="add-button" routerLink="/news/new">
+        <span class="material-icons">add</span>
+        Nueva Noticia
+      </button>
+    </div>
+  </app-controls>
+  
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+  </div>
+  
+  <ng-container *ngIf="!loading">
+    <!-- Mensaje cuando no hay noticias y el usuario es admin -->
+    <div *ngIf="allNews.length === 0 && isAdmin" class="empty-state">
+      <span class="material-icons">article</span>
+      <h2>No hay noticias publicadas</h2>
+      <p>Sé el primero en crear una noticia para compartir con la comunidad.</p>
+      <button class="create-button" routerLink="/news/new">
+        <span class="material-icons">add</span>
+        Crear Primera Noticia
+      </button>
+    </div>
+    
+    <!-- Mensaje cuando no hay noticias y el usuario no es admin -->
+    <div *ngIf="allNews.length === 0 && !isAdmin" class="empty-state">
+      <span class="material-icons">article</span>
+      <h2>No hay noticias publicadas</h2>
+      <p>Pronto estaremos publicando las últimas noticias deportivas. ¡Vuelve pronto!</p>
+    </div>
+    
+    <!-- Destacados -->
+    <div *ngIf="showFeatured && featuredNews.length > 0" class="featured-section">
+      <h2 class="section-title">Destacados</h2>
+      
+      <div class="featured-grid">
+        <div class="featured-main" *ngIf="featuredNews[0]">
+          <div class="featured-card" [routerLink]="['/news', featuredNews[0].id]">
+            <div class="featured-image">
+              <img [src]="featuredNews[0].image || 'assets/images/placeholder.jpg'" [alt]="featuredNews[0].title">
+            </div>
+            <div class="featured-content">
+              <div class="featured-tags" *ngIf="featuredNews[0].tags.length > 0">
+                <span class="tag" *ngFor="let tag of featuredNews[0].tags.slice(0, 2)">{{tag}}</span>
+              </div>
+              <h3 class="featured-title">{{featuredNews[0].title}}</h3>
+              <p class="featured-summary">{{featuredNews[0].summary}}</p>
+              <div class="featured-meta">
+                <span class="featured-author">Por {{featuredNews[0].author}}</span>
+                <span class="featured-date">{{featuredNews[0].publishDate | date:'dd/MM/yyyy'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="featured-secondary">
+          <div class="featured-card-small" *ngFor="let news of featuredNews.slice(1, 3)" [routerLink]="['/news', news.id]">
+            <div class="featured-image-small">
+              <img [src]="news.image || 'assets/images/placeholder.jpg'" [alt]="news.title">
+            </div>
+            <div class="featured-content-small">
+              <div class="featured-tags" *ngIf="news.tags.length > 0">
+                <span class="tag" *ngFor="let tag of news.tags.slice(0, 1)">{{tag}}</span>
+              </div>
+              <h4 class="featured-title-small">{{news.title}}</h4>
+              <div class="featured-meta">
+                <span class="featured-author">Por {{news.author}}</span>
+                <span class="featured-date">{{news.publishDate | date:'dd/MM/yyyy'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Lista de noticias -->
+    <div class="news-section" *ngIf="allNews.length > 0">
+      <h2 class="section-title" *ngIf="filteredNews.length > 0">Todas las Noticias</h2>
+      
+      <div class="news-grid" *ngIf="filteredNews.length > 0">
+        <app-news-card 
+          *ngFor="let news of paginatedNews" 
+          [news]="news">
+        </app-news-card>
+      </div>
+      
+      <div *ngIf="filteredNews.length === 0" class="no-results">
+        <span class="material-icons">search_off</span>
+        <p>No se encontraron noticias con los filtros seleccionados</p>
+        <button class="reset-button" (click)="resetFilters()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+    
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button 
+        class="pagination-button" 
+        [disabled]="currentPage === 0" 
+        (click)="onPageChange(currentPage - 1)">
+        &laquo; Anterior
+      </button>
+      
+      <span class="pagination-info">
+        Página {{currentPage + 1}} de {{totalPages}}
+      </span>
+      
+      <button 
+        class="pagination-button" 
+        [disabled]="currentPage >= totalPages - 1" 
+        (click)="onPageChange(currentPage + 1)">
+        Siguiente &raquo;
+      </button>
+    </div>
+  </ng-container>
+</div>

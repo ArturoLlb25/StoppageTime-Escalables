@@ -1,0 +1,388 @@
+/* Estilos para el header */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.main-header {
+  background-color: var(--color-primary);
+  color: var(--text-on-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--text-on-dark);
+  letter-spacing: 1px;
+}
+
+.logo-time {
+  color: var(--color-accent);
+}
+
+/* Menú desktop */
+.desktop-menu {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-menu {
+    display: block;
+  }
+}
+
+.desktop-menu ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.desktop-menu li {
+  margin: 0 0.5rem;
+}
+
+.desktop-menu a {
+  color: var(--text-on-dark);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.desktop-menu a:hover {
+  color: var(--color-secondary);
+}
+
+.desktop-menu a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--color-accent);
+  border-radius: 1.5px;
+}
+
+/* Botones de autenticación */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.desktop-auth {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-auth {
+    display: flex;
+  }
+}
+
+.login-button, .register-button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.login-button {
+  color: var(--text-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.register-button {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.register-button:hover {
+  background-color: var(--color-accent-light);
+}
+
+/* User Menu */
+.user-menu {
+  position: relative;
+}
+
+.user-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.user-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-secondary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 500;
+}
+
+.user-button img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dropdown-icon {
+  font-size: 0.7rem;
+  margin-left: 0.25rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  display: none;
+  z-index: 10;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text-on-light);
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f5f5f5;
+}
+
+/* Menú móvil */
+.mobile-menu-button {
+  display: block;
+  background: none;
+  border: none;
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+}
+
+.mobile-menu-button span, 
+.mobile-menu-button span::before, 
+.mobile-menu-button span::after {
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: var(--text-on-dark);
+  border-radius: 1.5px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-button span {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mobile-menu-button span::before, 
+.mobile-menu-button span::after {
+  content: '';
+  left: 0;
+}
+
+.mobile-menu-button span::before {
+  top: -8px;
+}
+
+.mobile-menu-button span::after {
+  bottom: -8px;
+}
+
+.mobile-menu-button span.open {
+  background-color: transparent;
+}
+
+.mobile-menu-button span.open::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.mobile-menu-button span.open::after {
+  transform: rotate(-45deg);
+  bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu-button {
+    display: none;
+  }
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background-color: var(--color-primary);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 999;
+  visibility: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-menu.open {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.mobile-menu ul {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+}
+
+.mobile-menu li {
+  margin: 1rem 0;
+}
+
+.mobile-menu a {
+  color: var(--text-on-dark);
+  text-decoration: none;
+  font-size: 1.1rem;
+  display: block;
+  padding: 0.5rem 0;
+}
+
+.mobile-menu a.active {
+  color: var(--color-accent);
+}
+
+.mobile-auth {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Footer */
+.main-footer {
+  background-color: var(--color-primary);
+  color: var(--text-on-dark);
+  padding: 2rem 0 1rem;
+  margin-top: 2rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+.footer-logo p {
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+.footer-links h3, .footer-social h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+  color: var(--text-on-dark);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: var(--color-secondary);
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icons a {
+  color: var(--text-on-dark);
+  font-size: 1.5rem;
+  transition: color 0.3s;
+}
+
+.social-icons a:hover {
+  color: var(--color-secondary);
+}
+
+.footer-bottom {
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}

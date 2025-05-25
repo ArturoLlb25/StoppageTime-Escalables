@@ -1,0 +1,37 @@
+<div class="match-card" [ngClass]="{'live': match.status === 'LIVE'}" [routerLink]="['/matches', match.id]">
+  <div class="match-status">
+    <span *ngIf="match.status === 'LIVE'" class="status-live">EN VIVO</span>
+    <span *ngIf="match.status === 'FINISHED'" class="status-finished">FINALIZADO</span>
+    <span *ngIf="match.status === 'SCHEDULED'" class="status-scheduled">{{formatMatchTime()}}</span>
+    <span *ngIf="match.status === 'CANCELED'" class="status-canceled">CANCELADO</span>
+  </div>
+  
+  <div class="match-league">
+    <img *ngIf="match.league.logo" [src]="match.league.logo" [alt]="match.league.name" class="league-logo">
+    <span>{{match.league.name}}</span>
+  </div>
+  
+  <div class="match-teams">
+    <div class="team home-team">
+      <img [src]="match.homeTeam.logo || 'assets/images/placeholder.jpg'" [alt]="match.homeTeam.name" class="team-logo">
+      <span class="team-name">{{match.homeTeam.name}}</span>
+    </div>
+    
+    <div class="match-score">
+      <ng-container *ngIf="match.status === 'SCHEDULED'">
+        <span class="vs">VS</span>
+      </ng-container>
+      
+      <ng-container *ngIf="match.status !== 'SCHEDULED'">
+        <span class="score-value">{{match.score?.home || 0}}</span>
+        <span class="score-separator">-</span>
+        <span class="score-value">{{match.score?.away || 0}}</span>
+      </ng-container>
+    </div>
+    
+    <div class="team away-team">
+      <img [src]="match.awayTeam.logo || 'assets/images/placeholder.jpg'" [alt]="match.awayTeam.name" class="team-logo">
+      <span class="team-name">{{match.awayTeam.name}}</span>
+    </div>
+  </div>
+</div>

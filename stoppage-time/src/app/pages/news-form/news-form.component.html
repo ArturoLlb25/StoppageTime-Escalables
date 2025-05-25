@@ -1,0 +1,122 @@
+<div class="container">
+  <mat-card class="news-form-card">
+    <div class="section-header">
+      <h1 class="page-title">{{ isEditing ? 'Editar' : 'Crear' }} Noticia</h1>
+      <button mat-stroked-button color="primary" routerLink="/news">
+        <mat-icon>arrow_back</mat-icon> Volver
+      </button>
+    </div>
+
+    <form [formGroup]="newsForm" (ngSubmit)="onSubmit()" class="news-form">
+      <!-- Título -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="title" placeholder="Título de la noticia">
+        <mat-error *ngIf="newsForm.get('title')?.hasError('required')">
+          El título es requerido
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('title')?.hasError('minlength')">
+          El título debe tener al menos 5 caracteres
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('title')?.hasError('maxlength')">
+          El título no debe exceder los 100 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Resumen -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Resumen</mat-label>
+        <textarea matInput formControlName="summary" rows="2" placeholder="Breve resumen de la noticia"></textarea>
+        <mat-error *ngIf="newsForm.get('summary')?.hasError('required')">
+          El resumen es requerido
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('summary')?.hasError('minlength')">
+          El resumen debe tener al menos 10 caracteres
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('summary')?.hasError('maxlength')">
+          El resumen no debe exceder los 200 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Contenido -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contenido</mat-label>
+        <textarea matInput formControlName="content" rows="10" placeholder="Contenido completo de la noticia"></textarea>
+        <mat-error *ngIf="newsForm.get('content')?.hasError('required')">
+          El contenido es requerido
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('content')?.hasError('minlength')">
+          El contenido debe tener al menos 50 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- URL de la imagen -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>URL de la Imagen</mat-label>
+        <input matInput formControlName="image" placeholder="https://ejemplo.com/imagen.jpg">
+        <mat-error *ngIf="newsForm.get('image')?.hasError('required')">
+          La URL de la imagen es requerida
+        </mat-error>
+        <mat-error *ngIf="newsForm.get('image')?.hasError('pattern')">
+          Ingresa una URL válida (debe comenzar con http:// o https://)
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Previsualización de la imagen -->
+      <div class="image-preview" *ngIf="newsForm.get('image')?.valid && newsForm.get('image')?.value">
+        <h3>Previsualización de la imagen</h3>
+        <img [src]="newsForm.get('image')?.value" alt="Previsualización">
+      </div>
+
+      <!-- Etiquetas -->
+      <div class="tags-section">
+        <h3>Etiquetas*</h3>
+        
+        <div class="selected-tags">
+          <mat-chip-set>
+            <mat-chip *ngFor="let tag of selectedTags" (removed)="removeTag(tag)">
+              {{ tag }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+        
+        <div class="tag-input">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Agregar etiqueta</mat-label>
+            <input matInput formControlName="tags" placeholder="Escriba y presione Enter">
+            <button mat-icon-button matSuffix (click)="addCustomTag()" [disabled]="!newsForm.get('tags')?.value">
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+        
+        <div class="tag-options">
+          <button mat-chip-option
+            *ngFor="let tag of tagOptions"
+            [selected]="selectedTags.includes(tag)"
+            (click)="toggleTag(tag)">
+            {{ tag }}
+          </button>
+        </div>
+        
+        <mat-error *ngIf="selectedTags.length === 0 && errorMessage">
+          {{ errorMessage }}
+        </mat-error>
+      </div>
+
+      <mat-divider class="my-3"></mat-divider>
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <button type="button" mat-stroked-button routerLink="/news">Cancelar</button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">{{ isEditing ? 'Actualizar' : 'Publicar' }} Noticia</span>
+          <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

@@ -1,0 +1,31 @@
+<div class="controls-container">
+  <div class="filter-controls">
+    <div class="search-field">
+      <input 
+        type="text" 
+        placeholder="Buscar..." 
+        [(ngModel)]="searchQuery" 
+        (keyup.enter)="applyFilters()">
+      <button 
+        *ngIf="searchQuery" 
+        (click)="clearSearch()" 
+        class="clear-search">
+        &#10005;
+      </button>
+    </div>
+    
+    <ng-content select="[filterControls]"></ng-content>
+  </div>
+  
+  <div class="action-controls">
+    <ng-content select="[actionControls]"></ng-content>
+    
+    <button 
+      class="refresh-button" 
+      *ngIf="showRefreshButton" 
+      (click)="refresh()">
+      <span class="material-icons">refresh</span>
+      Actualizar
+    </button>
+  </div>
+</div>

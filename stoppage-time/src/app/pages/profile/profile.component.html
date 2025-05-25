@@ -1,0 +1,188 @@
+<div class="container">
+  <h1 class="page-title">Mi Perfil</h1>
+  
+  <div class="profile-grid">
+    <!-- Columna izquierda - Información de Perfil -->
+    <mat-card class="profile-section">
+      <mat-card-header>
+        <mat-card-title>Información Personal</mat-card-title>
+        <button 
+          mat-stroked-button 
+          color="primary" 
+          *ngIf="!isEditingProfile" 
+          (click)="toggleEditProfile()">
+          <mat-icon>edit</mat-icon> Editar
+        </button>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Vista de perfil -->
+        <div *ngIf="!isEditingProfile" class="profile-info">
+          <div class="avatar-container">
+            <img 
+              [src]="user?.profilePicture || 'assets/images/default-avatar.jpg'" 
+              alt="Avatar" 
+              class="profile-avatar"
+            >
+            <label class="avatar-edit-button">
+              <mat-icon>add_a_photo</mat-icon>
+              <input type="file" accept="image/*" (change)="onFileSelected($event)">
+            </label>
+          </div>
+          
+          <!-- Previsualización de nueva imagen -->
+          <div *ngIf="previewUrl" class="preview-container">
+            <div class="preview-image-container">
+              <img [src]="previewUrl" alt="Preview" class="preview-image">
+              <button mat-raised-button color="accent" (click)="uploadProfileImage()" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Guardar imagen</span>
+                <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+              </button>
+            </div>
+          </div>
+          
+          <div class="info-group">
+            <span class="info-label">Nombre</span>
+            <span class="info-value">{{ user?.name }}</span>
+          </div>
+          
+          <div class="info-group">
+            <span class="info-label">Correo Electrónico</span>
+            <span class="info-value">{{ user?.email }}</span>
+          </div>
+          
+          <div class="info-group">
+            <span class="info-label">Rol</span>
+            <span class="info-value">{{ user?.role === 'admin' ? 'Administrador' : 'Usuario' }}</span>
+          </div>
+        </div>
+        
+        <!-- Formulario de edición de perfil -->
+        <form *ngIf="isEditingProfile" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="name">
+            <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+            <mat-error *ngIf="profileForm.get('name')?.hasError('minlength')">
+              El nombre debe tener al menos 3 caracteres
+            </mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo Electrónico</mat-label>
+            <input matInput type="email" formControlName="email">
+            <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+              El correo es requerido
+            </mat-error>
+            <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+              Ingresa un correo válido
+            </mat-error>
+          </mat-form-field>
+          
+          <div class="form-actions">
+            <button type="button" mat-stroked-button (click)="toggleEditProfile()">Cancelar</button>
+            <button type="submit" mat-raised-button color="primary" [disabled]="profileForm.invalid || isLoading">
+              <span *ngIf="!isLoading">Guardar Cambios</span>
+              <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+    
+    <!-- Columna derecha - Seguridad y Preferencias -->
+    <div>
+      <!-- Selector de secciones -->
+      <div class="section-selector">
+        <button 
+          mat-button 
+          [class.active]="activeSecurityTab === 'password'"
+          (click)="activeSecurityTab = 'password'"
+        >
+          <mat-icon>lock</mat-icon> Seguridad
+        </button>
+        <button 
+          mat-button 
+          [class.active]="activeSecurityTab === 'session'"
+          (click)="activeSecurityTab = 'session'"
+        >
+          <mat-icon>exit_to_app</mat-icon> Sesión
+        </button>
+      </div>
+      
+      <mat-card class="profile-section">
+        <!-- Sección de Seguridad (Cambio de contraseña) -->
+        <div *ngIf="activeSecurityTab === 'password'" class="tab-content">
+          <div class="section-header">
+            <h2>Cambiar Contraseña</h2>
+            <button 
+              mat-stroked-button 
+              color="primary" 
+              *ngIf="!isChangingPassword" 
+              (click)="toggleChangePassword()">
+              <mat-icon>lock</mat-icon> Cambiar Contraseña
+            </button>
+          </div>
+          
+          <!-- Formulario de cambio de contraseña -->
+          <form *ngIf="isChangingPassword" [formGroup]="passwordForm" (ngSubmit)="savePassword()" class="password-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contraseña Actual</mat-label>
+              <input matInput type="password" formControlName="currentPassword">
+              <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+                La contraseña actual es requerida
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nueva Contraseña</mat-label>
+              <input matInput type="password" formControlName="newPassword">
+              <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+                La nueva contraseña es requerida
+              </mat-error>
+              <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                La contraseña debe tener al menos 6 caracteres
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Confirmar Contraseña</mat-label>
+              <input matInput type="password" formControlName="confirmPassword">
+              <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+                Confirma tu contraseña
+              </mat-error>
+              <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('passwordMismatch')">
+                Las contraseñas no coinciden
+              </mat-error>
+            </mat-form-field>
+            
+            <div class="form-actions">
+              <button type="button" mat-stroked-button (click)="toggleChangePassword()">Cancelar</button>
+              <button type="submit" mat-raised-button color="primary" [disabled]="passwordForm.invalid || isPasswordLoading">
+                <span *ngIf="!isPasswordLoading">Guardar Contraseña</span>
+                <mat-spinner *ngIf="isPasswordLoading" diameter="20"></mat-spinner>
+              </button>
+            </div>
+          </form>
+          
+          <div *ngIf="!isChangingPassword">
+            <p class="password-info">
+              Mantén tu cuenta segura cambiando tu contraseña regularmente. La contraseña debe tener al menos 6 caracteres.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Sección de Sesión -->
+        <div *ngIf="activeSecurityTab === 'session'" class="tab-content">
+          <h2>Sesión Actual</h2>
+          <p>Cierra tu sesión actual en el sitio</p>
+          <button mat-raised-button color="warn" (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon> Cerrar Sesión
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+<div class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <h1>STOPPAGE.<span class="accent">TIME</span></h1>
+      <p class="hero-subtitle">Tu fuente de información deportiva en tiempo real</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Partidos en Vivo -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Partidos en Vivo</h2>
+      <a routerLink="/matches" class="view-all-link">Ver todos <span class="material-icons">arrow_forward</span></a>
+    </div>
+    
+    <div *ngIf="liveMatches.length > 0; else noLiveMatches" class="matches-grid">
+      <app-match-card 
+        *ngFor="let match of liveMatches" 
+        [match]="match">
+      </app-match-card>
+    </div>
+    
+    <ng-template #noLiveMatches>
+      <div class="no-content">
+        <p>No hay partidos en vivo en este momento</p>
+      </div>
+    </ng-template>
+  </section>
+  
+  <!-- Noticias Destacadas -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Noticias Destacadas</h2>
+      <a routerLink="/news" class="view-all-link">Ver todas <span class="material-icons">arrow_forward</span></a>
+    </div>
+    
+    <div *ngIf="featuredNews.length > 0; else noNews" class="news-grid">
+      <app-news-card 
+        *ngFor="let news of featuredNews" 
+        [news]="news">
+      </app-news-card>
+    </div>
+    
+    <ng-template #noNews>
+      <div class="no-content">
+        <p>No hay noticias disponibles</p>
+      </div>
+    </ng-template>
+  </section>
+  
+  <!-- Estadísticas -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Estadísticas Destacadas</h2>
+      <a routerLink="/statistics" class="view-all-link">Ver más <span class="material-icons">arrow_forward</span></a>
+    </div>
+    
+    <div class="standings-tabs">
+      <div class="tabs-nav">
+        <div 
+          *ngFor="let tab of leagueTabs; let i = index" 
+          class="tab-item" 
+          [class.active]="activeTabIndex === i"
+          (click)="setActiveTab(i)">
+          {{tab.name}}
+        </div>
+      </div>
+      
+      <div class="tab-content">
+        <div class="standings-table" *ngFor="let tab of leagueTabs; let i = index" [class.active]="activeTabIndex === i">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Equipo</th>
+                <th>PJ</th>
+                <th>G</th>
+                <th>E</th>
+                <th>P</th>
+                <th>PTS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let team of tab.standings.slice(0, 5); let j = index">
+                <td>{{j + 1}}</td>
+                <td class="team-cell">
+                  <img [src]="team.team.logo || 'assets/images/placeholder.jpg'" [alt]="team.team.name">
+                  <span>{{team.team.name}}</span>
+                </td>
+                <td>{{team.played}}</td>
+                <td>{{team.win}}</td>
+                <td>{{team.draw}}</td>
+                <td>{{team.lose}}</td>
+                <td class="points">{{team.points}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

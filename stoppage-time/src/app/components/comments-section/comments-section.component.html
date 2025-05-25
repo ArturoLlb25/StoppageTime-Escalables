@@ -1,0 +1,139 @@
+<mat-card class="comments-section">
+  <mat-card-header>
+    <mat-card-title class="comments-title">Comentarios de la comunidad</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <!-- Estado de carga -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    
+    <div class="comments-container" *ngIf="!isLoading">
+      <!-- Mostrar cuando no hay comentarios -->
+      <div *ngIf="comments.length === 0" class="no-comments">
+        <mat-icon class="no-comments-icon">chat_bubble_outline</mat-icon>
+        <p class="no-comments-text">No hay comentarios todavía. ¡Sé el primero en comentar!</p>
+      </div>
+
+      <!-- Lista de comentarios -->
+      <ng-container *ngIf="comments.length > 0">
+        <div class="comment" *ngFor="let comment of comments">
+          <!-- Comentario principal -->
+          <mat-card class="comment-card">
+            <mat-card-header>
+              <img matCardAvatar [src]="comment.userImage || 'assets/images/default-avatar.jpg'" alt="Avatar">
+              <mat-card-title class="user-name">{{comment.userName}}</mat-card-title>
+              <mat-card-subtitle>{{comment.date | date:'dd/MM/yyyy, h:mm a'}}</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <p class="comment-text">{{comment.content}}</p>
+            </mat-card-content>
+            
+            <mat-card-actions align="end">
+              <button mat-button color="primary" (click)="toggleReplyForm(comment.id)" *ngIf="isLoggedIn">
+                <mat-icon>reply</mat-icon> Responder
+              </button>
+              <button mat-button color="accent" (click)="startEditComment(comment)" *ngIf="canEditComment(comment)">
+                <mat-icon>edit</mat-icon> Editar
+              </button>
+              <button mat-button color="warn" (click)="deleteComment(comment.id)" *ngIf="canDeleteComment(comment)">
+                <mat-icon>delete</mat-icon> Eliminar
+              </button>
+            </mat-card-actions>
+            
+            <!-- Formulario de respuesta -->
+            <div class="reply-form" *ngIf="showReplyForm === comment.id">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tu respuesta</mat-label>
+                <textarea matInput rows="3" [(ngModel)]="replyContent" placeholder="Escribe tu respuesta..."></textarea>
+              </mat-form-field>
+              <div class="form-actions">
+                <button mat-stroked-button (click)="cancelReply()">Cancelar</button>
+                <button mat-raised-button color="primary" (click)="submitReply(comment.id)" [disabled]="!replyContent.trim()">
+                  Publicar
+                </button>
+              </div>
+            </div>
+            
+            <!-- Formulario de edición -->
+            <div class="edit-form" *ngIf="editingComment?.id === comment.id">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Editar comentario</mat-label>
+                <textarea matInput rows="3" [(ngModel)]="editContent"></textarea>
+              </mat-form-field>
+              <div class="form-actions">
+                <button mat-stroked-button (click)="cancelEdit()">Cancelar</button>
+                <button mat-raised-button color="primary" (click)="submitEdit()" [disabled]="!editContent.trim()">
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </mat-card>
+          
+          <!-- Respuestas al comentario -->
+          <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+            <mat-card class="reply-card" *ngFor="let reply of comment.replies">
+              <mat-card-header>
+                <img matCardAvatar [src]="reply.userImage || 'assets/images/default-avatar.jpg'" alt="Avatar">
+                <mat-card-title class="user-name">{{reply.userName}}</mat-card-title>
+                <mat-card-subtitle>{{reply.date | date:'dd/MM/yyyy, h:mm a'}}</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <p class="comment-text">{{reply.content}}</p>
+              </mat-card-content>
+              
+              <mat-card-actions align="end">
+                <button mat-button color="accent" (click)="startEditComment(reply)" *ngIf="canEditComment(reply)">
+                  <mat-icon>edit</mat-icon> Editar
+                </button>
+                <button mat-button color="warn" (click)="deleteComment(reply.id)" *ngIf="canDeleteComment(reply)">
+                  <mat-icon>delete</mat-icon> Eliminar
+                </button>
+              </mat-card-actions>
+              
+              <!-- Formulario de edición para respuestas -->
+              <div class="edit-form" *ngIf="editingComment?.id === reply.id">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Editar respuesta</mat-label>
+                  <textarea matInput rows="3" [(ngModel)]="editContent"></textarea>
+                </mat-form-field>
+                <div class="form-actions">
+                  <button mat-stroked-button (click)="cancelEdit()">Cancelar</button>
+                  <button mat-raised-button color="primary" (click)="submitEdit()" [disabled]="!editContent.trim()">
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </mat-card>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </mat-card-content>
+  
+  <!-- Formulario de nuevo comentario -->
+  <mat-card-actions *ngIf="isLoggedIn">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Escribe tu comentario</mat-label>
+      <textarea matInput rows="4" [(ngModel)]="newCommentContent" placeholder="Comparte tu opinión..."></textarea>
+    </mat-form-field>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="submitNewComment()" 
+      [disabled]="!newCommentContent.trim()"
+      class="submit-button">
+      Publicar Comentario
+    </button>
+  </mat-card-actions>
+  
+  <!-- Mensaje para usuarios no autenticados -->
+  <mat-card-footer *ngIf="!isLoggedIn">
+    <div class="login-prompt">
+      <p>Debes <a [routerLink]="['/login']">iniciar sesión</a> para comentar.</p>
+    </div>
+  </mat-card-footer>
+</mat-card>

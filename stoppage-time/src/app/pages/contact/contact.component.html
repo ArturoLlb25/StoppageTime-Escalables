@@ -1,0 +1,156 @@
+<div class="contact-container">
+  <div class="container">
+    <h1 class="page-title">Contacto</h1>
+    
+    <div class="contact-grid">
+      <div class="contact-info glass-card">
+        <h2>Contáctanos</h2>
+        <p>Si tienes alguna pregunta, sugerencia o comentario, no dudes en contactarnos. Estamos aquí para ayudarte.</p>
+        
+        <div class="info-items">
+          <div class="info-item">
+            <span class="material-icons">email</span>
+            <div class="item-content">
+              <h3>Correo Electrónico</h3>
+              <p>infostoppage-time.com</p>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">phone</span>
+            <div class="item-content">
+              <h3>Teléfono</h3>
+              <p>+52 (81) 1234 5678</p>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">location_on</span>
+            <div class="item-content">
+              <h3>Dirección</h3>
+              <p>Av. Universidad 123, San Nicolás de los Garza, Nuevo León, México</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="social-links">
+          <h3>Síguenos</h3>
+          <div class="social-icons">
+            <a href="#" class="social-icon" aria-label="Facebook">
+              <span class="material-icons">facebook</span>
+            </a>
+            <a href="#" class="social-icon" aria-label="Twitter">
+              <span class="material-icons">twitter</span>
+            </a>
+            <a href="#" class="social-icon" aria-label="Instagram">
+              <span class="material-icons">instagram</span>
+            </a>
+            <a href="#" class="social-icon" aria-label="YouTube">
+              <span class="material-icons">smart_display</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="contact-form-container glass-card">
+        <div *ngIf="!isSubmitted; else thankYouMessage">
+          <h2>Envíanos un Mensaje</h2>
+          
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+            <div class="form-group">
+              <label for="name">Nombre</label>
+              <input 
+                type="text" 
+                id="name" 
+                formControlName="name" 
+                placeholder="Tu nombre"
+                [class.is-invalid]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched"
+              >
+              <div class="error-message" *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+                <span *ngIf="contactForm.get('name')?.errors?.['required']">El nombre es requerido</span>
+                <span *ngIf="contactForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Correo Electrónico</label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email" 
+                placeholder="tu@email.com"
+                [class.is-invalid]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched"
+              >
+              <div class="error-message" *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+                <span *ngIf="contactForm.get('email')?.errors?.['required']">El correo es requerido</span>
+                <span *ngIf="contactForm.get('email')?.errors?.['email']">Ingresa un correo válido</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="subject">Asunto</label>
+              <input 
+                type="text" 
+                id="subject" 
+                formControlName="subject" 
+                placeholder="Asunto de tu mensaje"
+                [class.is-invalid]="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched"
+              >
+              <div class="error-message" *ngIf="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched">
+                <span *ngIf="contactForm.get('subject')?.errors?.['required']">El asunto es requerido</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">Mensaje</label>
+              <textarea 
+                id="message" 
+                formControlName="message" 
+                placeholder="Tu mensaje aquí..."
+                rows="6"
+                [class.is-invalid]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched"
+              ></textarea>
+              <div class="error-message" *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+                <span *ngIf="contactForm.get('message')?.errors?.['required']">El mensaje es requerido</span>
+                <span *ngIf="contactForm.get('message')?.errors?.['minlength']">El mensaje debe tener al menos 10 caracteres</span>
+              </div>
+            </div>
+            
+            <button 
+              type="submit" 
+              class="btn-primary" 
+              [disabled]="contactForm.invalid || isLoading"
+            >
+              <span *ngIf="!isLoading">Enviar Mensaje</span>
+              <span *ngIf="isLoading" class="spinner"></span>
+            </button>
+          </form>
+        </div>
+        
+        <ng-template #thankYouMessage>
+          <div class="thank-you-message">
+            <span class="material-icons success-icon">check_circle</span>
+            <h2>¡Mensaje Enviado!</h2>
+            <p>Gracias por contactarnos. Hemos recibido tu mensaje y te responderemos lo antes posible.</p>
+            <button class="btn-primary" (click)="isSubmitted = false">Enviar otro mensaje</button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+    
+    <!-- Mapa de Google -->
+    <div class="map-container glass-card">
+      <h2>Encuéntranos</h2>
+      <div class="map-frame">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3595.9052491300747!2d-100.31470608497856!3d25.722200414959184!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8662942fcf8fbca9%3A0xf2a4d17583284aa6!2sUniversidad%20Autonoma%20de%20Nuevo%20Leon!5e0!3m2!1ses-419!2smx!4v1621520882659!5m2!1ses-419!2smx" 
+          width="100%" 
+          height="450" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>

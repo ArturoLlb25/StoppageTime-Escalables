@@ -1,0 +1,158 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
+  background: url('/assets/images/soccer-stadium-blur.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 2.5rem;
+  border-radius: var(--border-radius-lg);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-header h1 {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.register-header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #e0e0e0;
+  padding: 0 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-container:focus-within {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(41, 121, 255, 0.2);
+}
+
+.input-container .material-icons {
+  color: #999;
+  margin-right: 0.5rem;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 0.75rem 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+}
+
+.input-container input.is-invalid {
+  border-color: var(--color-accent);
+}
+
+.error-message {
+  font-size: 0.8rem;
+  color: var(--color-accent);
+}
+
+.form-actions {
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-secondary);
+  color: white;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-secondary-light);
+}
+
+.btn-primary:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-alert {
+  background-color: rgba(215, 38, 56, 0.1);
+  color: var(--color-accent);
+  padding: 0.75rem;
+  border-radius: var(--border-radius-sm);
+  text-align: center;
+}
+
+.alternate-actions {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.alternate-actions a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.alternate-actions a:hover {
+  text-decoration: underline;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,122 @@
+<div class="container">
+  <h1 class="page-title">Partidos</h1>
+  
+  <app-controls 
+    (searchEvent)="onSearch($event)" 
+    (refreshEvent)="loadMatches()">
+    <div filterControls>
+      <div class="filter-select">
+        <label for="filterType">Filtrar por</label>
+        <select id="filterType" [(ngModel)]="filterType" (change)="applyFilters()">
+          <option value="all">Todos</option>
+          <option value="live">En vivo</option>
+          <option value="today">Hoy</option>
+          <option value="upcoming">Próximos</option>
+          <option value="finished">Finalizados</option>
+        </select>
+      </div>
+      
+      <div class="filter-select">
+        <label for="selectedLeague">Liga</label>
+        <select id="selectedLeague" [(ngModel)]="selectedLeague" (change)="applyFilters()">
+          <option value="all">Todas</option>
+          <option *ngFor="let league of leagues" [value]="league.id">{{league.name}}</option>
+        </select>
+      </div>
+    </div>
+  </app-controls>
+  
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+  </div>
+  
+  <ng-container *ngIf="!loading">
+    <!-- Partidos en vivo -->
+    <div *ngIf="liveMatches.length > 0" class="match-section">
+      <h2 class="section-title">
+        <span class="material-icons live">sports_score</span>
+        En Vivo
+      </h2>
+      
+      <div class="matches-grid">
+        <app-match-card 
+          *ngFor="let match of liveMatches" 
+          [match]="match">
+        </app-match-card>
+      </div>
+    </div>
+    
+    <!-- Partidos de hoy -->
+    <div *ngIf="todayMatches.length > 0" class="match-section">
+      <h2 class="section-title">
+        <span class="material-icons today">today</span>
+        Hoy
+      </h2>
+      
+      <div class="matches-grid">
+        <app-match-card 
+          *ngFor="let match of todayMatches" 
+          [match]="match">
+        </app-match-card>
+      </div>
+    </div>
+    
+    <!-- Próximos partidos -->
+    <div *ngIf="upcomingMatches.length > 0" class="match-section">
+      <h2 class="section-title">
+        <span class="material-icons upcoming">event</span>
+        Próximos
+      </h2>
+      
+      <div class="matches-grid">
+        <app-match-card 
+          *ngFor="let match of upcomingMatches" 
+          [match]="match">
+        </app-match-card>
+      </div>
+    </div>
+    
+    <!-- Partidos finalizados -->
+    <div *ngIf="finishedMatches.length > 0" class="match-section">
+      <h2 class="section-title">
+        <span class="material-icons finished">check_circle</span>
+        Finalizados
+      </h2>
+      
+      <div class="matches-grid">
+        <app-match-card 
+          *ngFor="let match of finishedMatches" 
+          [match]="match">
+        </app-match-card>
+      </div>
+    </div>
+    
+    <div *ngIf="noMatchesFound" class="no-matches">
+      <span class="material-icons">sports_soccer</span>
+      <p>No se encontraron partidos con los filtros seleccionados</p>
+      <button class="reset-button" (click)="resetFilters()">
+        Limpiar filtros
+      </button>
+    </div>
+  </ng-container>
+  
+  <div class="pagination" *ngIf="totalMatches > pageSize">
+    <button 
+      class="pagination-button" 
+      [disabled]="currentPage === 0" 
+      (click)="onPageChange(currentPage - 1)">
+      &laquo; Anterior
+    </button>
+    
+    <span class="pagination-info">
+      Página {{currentPage + 1}} de {{totalPages}}
+    </span>
+    
+    <button 
+      class="pagination-button" 
+      [disabled]="currentPage >= totalPages - 1" 
+      (click)="onPageChange(currentPage + 1)">
+      Siguiente &raquo;
+    </button>
+  </div>
+</div>

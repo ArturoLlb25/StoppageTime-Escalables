@@ -1,0 +1,121 @@
+<div class="app-container">
+  <header class="main-header">
+    <div class="container">
+      <div class="logo-container">
+        <a routerLink="/">
+          <h1 class="logo-text">STOPPAGE.<span class="logo-time">TIME</span></h1>
+        </a>
+      </div>
+      
+      <!-- Menú para escritorio -->
+      <nav class="desktop-menu">
+        <ul>
+          <li><a routerLink="/matches" routerLinkActive="active">Partidos</a></li>
+          <li><a routerLink="/statistics" routerLinkActive="active">Estadísticas</a></li>
+          <li><a routerLink="/news" routerLinkActive="active">Noticias</a></li>
+          <li><a routerLink="/contact" routerLinkActive="active">Contacto</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Botones de autenticación para escritorio -->
+      <div class="auth-buttons desktop-auth">
+        <ng-container *ngIf="!(isLoggedIn$ | async); else loggedInTemplate">
+          <a routerLink="/login" class="login-button">Iniciar Sesión</a>
+          <a routerLink="/register" class="register-button">Registro</a>
+        </ng-container>
+        <ng-template #loggedInTemplate>
+          <div class="user-menu">
+            <button class="user-button" (click)="toggleUserMenu()">
+              <img *ngIf="(currentUser$ | async)?.profilePicture" [src]="(currentUser$ | async)?.profilePicture" alt="Perfil">
+              <span *ngIf="!(currentUser$ | async)?.profilePicture" class="user-initial">
+                {{(currentUser$ | async)?.name?.charAt(0) || 'U'}}
+              </span>
+              <span class="user-name">{{(currentUser$ | async)?.name}}</span>
+              <span class="dropdown-icon">▼</span>
+            </button>
+            <div class="dropdown-menu" [class.show]="showUserMenu">
+              <a routerLink="/profile">Mi Perfil</a>
+              <a href="javascript:void(0)" (click)="logout()">Cerrar Sesión</a>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      
+      <!-- Botón de menú para móvil -->
+      <button class="mobile-menu-button" (click)="toggleMobileMenu()">
+        <span [class.open]="isMobileMenuOpen"></span>
+      </button>
+    </div>
+    
+    <!-- Menú móvil desplegable -->
+    <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+      <nav>
+        <ul>
+          <li><a routerLink="/matches" routerLinkActive="active" (click)="closeMobileMenu()">Partidos</a></li>
+          <li><a routerLink="/statistics" routerLinkActive="active" (click)="closeMobileMenu()">Estadísticas</a></li>
+          <li><a routerLink="/news" routerLinkActive="active" (click)="closeMobileMenu()">Noticias</a></li>
+          <li><a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contacto</a></li>
+        </ul>
+        
+        <!-- Botones de autenticación para móvil -->
+        <div class="auth-buttons mobile-auth">
+          <ng-container *ngIf="!(isLoggedIn$ | async); else mobileLoggedIn">
+            <a routerLink="/login" (click)="closeMobileMenu()" class="login-button">Iniciar Sesión</a>
+            <a routerLink="/register" (click)="closeMobileMenu()" class="register-button">Registro</a>
+          </ng-container>
+          <ng-template #mobileLoggedIn>
+            <a routerLink="/profile" (click)="closeMobileMenu()">Mi Perfil</a>
+            <a href="javascript:void(0)" (click)="logout(); closeMobileMenu()">Cerrar Sesión</a>
+          </ng-template>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2 class="logo-text">STOPPAGE.<span class="logo-time">TIME</span></h2>
+          <p>Tu fuente de información deportiva en tiempo real</p>
+        </div>
+        
+        <div class="footer-links">
+          <h3>Enlaces</h3>
+          <ul>
+            <li><a routerLink="/matches">Partidos</a></li>
+            <li><a routerLink="/statistics">Estadísticas</a></li>
+            <li><a routerLink="/news">Noticias</a></li>
+            <li><a routerLink="/contact">Contacto</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-social">
+          <h3>Síguenos</h3>
+          <div class="social-icons">
+            <a href="#" target="_blank" aria-label="Facebook">
+              <span class="material-icons">facebook</span>
+            </a>
+            <a href="#" target="_blank" aria-label="Twitter">
+              <span class="material-icons">twitter</span>
+            </a>
+            <a href="#" target="_blank" aria-label="Instagram">
+              <span class="material-icons">instagram</span>
+            </a>
+            <a href="#" target="_blank" aria-label="YouTube">
+              <span class="material-icons">smart_display</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 STOPPAGE.TIME - Todos los derechos reservados</p>
+      </div>
+    </div>
+  </footer>
+</div>
