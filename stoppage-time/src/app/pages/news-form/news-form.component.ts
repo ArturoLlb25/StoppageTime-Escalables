@@ -179,7 +179,7 @@ export class NewsFormComponent implements OnInit {
           duration: 3000,
           panelClass: ['success-snackbar']
         });
-        this.router.navigate(['/news', createdNews.id]);
+        this.router.navigate(['/news']);
       },
       (error) => {
         this.isSubmitting = false;
@@ -197,7 +197,7 @@ export class NewsFormComponent implements OnInit {
           duration: 3000,
           panelClass: ['success-snackbar']
         });
-        this.router.navigate(['/news', updatedNews.id]);
+        this.router.navigate(['/news']);
       },
       (error) => {
         this.isSubmitting = false;

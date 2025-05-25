@@ -112,7 +112,7 @@
       <!-- Botones -->
       <div class="form-actions">
         <button type="button" mat-stroked-button routerLink="/news">Cancelar</button>
-        <button type="submit" mat-raised-button color="primary" [disabled]="isSubmitting">
+        <button type="submit"  mat-raised-button color="primary" [disabled]="isSubmitting">
           <span *ngIf="!isSubmitting">{{ isEditing ? 'Actualizar' : 'Publicar' }} Noticia</span>
           <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
         </button>
