@@ -24,9 +24,10 @@ class Server {
   }
 
   routes() {
-    this.app.use(this.authPath, require('../routes/auth'));
-    this.app.use(this.newsPath, require('../routes/news'));
-    this.app.use(this.usersPath, require('../routes/users'));
+    this.app.use(this.authPath, require("../routes/auth"));
+    this.app.use(this.newsPath, require("../routes/news"));
+    this.app.use(this.usersPath, require("../routes/users"));
+    this.app.use('/api/matches', require("../routes/matches")); // Añadir esta línea
   }
 
   listen() {

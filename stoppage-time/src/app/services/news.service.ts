@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { News } from '../interfaces/news.interface';
 import { Comment } from '../interfaces/comment.interface';
@@ -16,15 +16,24 @@ export class NewsService {
 
   // Obtener todas las noticias
   getAllNews(): Observable<News[]> {
-    return this.http.get<News[]>(`${this.backendUrl}/news`)
-      .pipe(
-        catchError(error => {
-          console.error('Error al obtener noticias:', error);
-          // Retornar array vacío en caso de error
-          return of([]);
-        })
-      );
-  }
+  return this.http.get<News[]>(`${this.backendUrl}/news`)
+    .pipe(
+      tap(news => {
+        console.log('Noticias recibidas:', news);
+        // Verifica que cada noticia tenga un ID válido
+        news.forEach(item => {
+          if (!item.id) {
+            console.warn('Noticia sin ID:', item);
+          }
+        });
+      }),
+      catchError(error => {
+        console.error('Error al obtener noticias:', error);
+        // Retornar array vacío en caso de error
+        return of([]);
+      })
+    );
+}
 
   // Obtener noticias destacadas
   getFeaturedNews(): Observable<News[]> {
@@ -40,10 +49,20 @@ export class NewsService {
 
   // Obtener una noticia por ID
   getNewsById(id: string): Observable<News> {
+    console.log(`Solicitando noticia con ID: "${id}"`);
+    
+    if (!id || id === 'undefined') {
+      console.error('Intentando obtener noticia con ID inválido');
+      return throwError(() => new Error('ID no válido'));
+    }
+    
     return this.http.get<News>(`${this.backendUrl}/news/${id}`)
       .pipe(
+        tap(news => {
+          console.log(`Noticia obtenida con ID: ${id}`, news);
+        }),
         catchError(error => {
-          console.error(`Error al obtener la noticia con ID ${id}:`, error);
+          console.error(`Error al obtener noticia con ID ${id}:`, error);
           return throwError(() => error);
         })
       );

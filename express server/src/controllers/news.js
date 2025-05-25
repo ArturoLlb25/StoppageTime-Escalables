@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const News = require('../models/news');
 const Comment = require('../models/comment');
+const mongoose = require('mongoose');
 
 // Obtener todas las noticias
 const getAllNews = async (req = request, res = response) => {
@@ -8,7 +9,20 @@ const getAllNews = async (req = request, res = response) => {
     const news = await News.find()
       .sort({ publishDate: -1 });
     
-    res.json(news);
+    // Asegúrate de que cada noticia tiene el ID correctamente transformado
+    const newsWithFormattedId = news.map(item => ({
+      id: item._id,
+      title: item.title,
+      content: item.content,
+      summary: item.summary,
+      image: item.image,
+      author: item.author,
+      authorId: item.authorId,
+      publishDate: item.publishDate,
+      tags: item.tags
+    }));
+    
+    res.json(newsWithFormattedId);
     
   } catch (error) {
     console.log(error);
@@ -40,19 +54,54 @@ const getFeaturedNews = async (req = request, res = response) => {
 const getNewsById = async (req = request, res = response) => {
   const { id } = req.params;
   
+  console.log(`Intentando buscar noticia con ID: "${id}"`);
+  
+  // Validar que el ID no sea undefined o no tenga formato válido
+  if (!id || id === 'undefined') {
+    console.log('ID no válido (undefined)');
+    return res.status(404).json({
+      msg: 'ID de noticia no válido'
+    });
+  }
+  
   try {
+    // Verificar formato de ObjectId
+    const isValidObjectId = mongoose.isValidObjectId(id);
+    if (!isValidObjectId) {
+      console.log(`ID no tiene formato válido de ObjectId: ${id}`);
+      return res.status(404).json({
+        msg: 'ID de noticia no válido'
+      });
+    }
+    
     const news = await News.findById(id);
     
     if (!news) {
+      console.log(`No se encontró noticia con ID: ${id}`);
       return res.status(404).json({
         msg: 'Noticia no encontrada'
       });
     }
     
-    res.json(news);
+    // Asegurarnos de transformar _id a id para el frontend
+    const newsWithId = {
+      id: news._id.toString(),
+      title: news.title,
+      content: news.content,
+      summary: news.summary,
+      image: news.image,
+      author: news.author,
+      authorId: news.authorId,
+      publishDate: news.publishDate,
+      tags: news.tags || []
+    };
+    
+    console.log(`Noticia encontrada con ID: ${id}`, newsWithId);
+    
+    res.json(newsWithId);
     
   } catch (error) {
-    console.log(error);
+    console.log(`Error al buscar noticia con ID: ${id}`, error);
     return res.status(500).json({
       msg: 'Error en el servidor'
     });

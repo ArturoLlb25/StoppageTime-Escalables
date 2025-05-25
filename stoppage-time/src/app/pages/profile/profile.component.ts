@@ -150,6 +150,50 @@ export class ProfileComponent implements OnInit {
     }
     this.passwordError = '';
   }
+
+
+  resizeImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        const img = new Image();
+        img.onload = () => {
+          // Crear un canvas para redimensionar la imagen
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;
+          const MAX_HEIGHT = 500;
+          let width = img.width;
+          let height = img.height;
+          
+          // Calcular las nuevas dimensiones manteniendo la proporción
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Convertir a JPEG con menor calidad para reducir tamaño
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+        img.src = event.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
   
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -160,9 +204,9 @@ export class ProfileComponent implements OnInit {
     
     this.selectedFile = input.files[0];
     
-    // Verificar tamaño del archivo (máximo 5MB)
-    if (this.selectedFile.size > 5 * 1024 * 1024) {
-      this.snackBar.open('La imagen no debe superar los 5MB', 'Cerrar', {
+    // Verificar tamaño del archivo
+    if (this.selectedFile.size > 10 * 1024 * 1024) { // 10MB
+      this.snackBar.open('La imagen no debe superar los 10MB', 'Cerrar', {
         duration: 3000,
         panelClass: ['error-snackbar']
       });
@@ -170,7 +214,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
     
-    // Verificar tipo de archivo (solo imágenes)
+    // Verificar tipo de archivo
     if (!this.selectedFile.type.startsWith('image/')) {
       this.snackBar.open('El archivo debe ser una imagen (JPG, PNG, etc.)', 'Cerrar', {
         duration: 3000,
@@ -180,27 +224,31 @@ export class ProfileComponent implements OnInit {
       return;
     }
     
-    // Crear preview usando FileReader para convertir a URL de datos
-    const reader = new FileReader();
-    reader.onload = () => {
-      // Asegurar que el resultado sea string o ArrayBuffer
-      this.previewUrl = reader.result;
-    };
-    reader.readAsDataURL(this.selectedFile);
+    // Redimensionar la imagen antes de mostrarla
+    this.resizeImage(this.selectedFile).then(dataUrl => {
+      this.previewUrl = dataUrl;
+    }).catch(error => {
+      console.error('Error al redimensionar la imagen:', error);
+      this.snackBar.open('Error al procesar la imagen', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    });
   }
+
   
   uploadProfileImage(): void {
-    if (!this.selectedFile) {
+    if (!this.selectedFile || !this.previewUrl) {
       return;
     }
     
-    const formData = new FormData();
-    formData.append('profileImage', this.selectedFile);
-    
     this.isLoading = true;
     
-    this.userService.uploadProfileImage(formData).subscribe(
-      response => {
+    // Usar la imagen previamente redimensionada
+    const imageUrl = this.previewUrl.toString();
+    
+    this.userService.uploadProfileImage(imageUrl).subscribe({
+      next: (user) => {
         this.isLoading = false;
         this.snackBar.open('Imagen de perfil actualizada correctamente', 'Cerrar', {
           duration: 3000,
@@ -211,17 +259,17 @@ export class ProfileComponent implements OnInit {
         this.selectedFile = null;
         this.previewUrl = null;
         
-        // Recargar el perfil para mostrar la nueva imagen
-        this.loadUserProfile();
+        // Actualizar perfil
+        this.user = user;
       },
-      error => {
+      error: (error) => {
         this.isLoading = false;
         this.snackBar.open('Error al subir la imagen', 'Cerrar', {
           duration: 3000,
           panelClass: ['error-snackbar']
         });
       }
-    );
+    });
   }
   
   saveProfile(): void {

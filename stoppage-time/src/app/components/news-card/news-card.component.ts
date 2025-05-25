@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { News } from '../../interfaces/news.interface';
@@ -10,8 +10,15 @@ import { News } from '../../interfaces/news.interface';
   templateUrl: './news-card.component.html',
   styleUrls: ['./news-card.component.css']
 })
-export class NewsCardComponent {
+export class NewsCardComponent implements OnInit {
   @Input() news!: News;
+  
+  ngOnInit() {
+    // Verificar que la noticia tiene un id válido
+    if (!this.news || !this.news.id) {
+      console.error('Noticia sin ID válido:', this.news);
+    }
+  }
   
   // Limitar el número de etiquetas a mostrar
   getDisplayTags(): string[] {

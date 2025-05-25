@@ -62,43 +62,20 @@ export class UserService {
   }
 
   // Subir imagen de perfil
-  uploadProfileImage(formData: FormData): Observable<any> {
-    return this.http.post<any>(`${this.backendUrl}/users/profile-image`, formData)
+  uploadProfileImage(imageUrl: string): Observable<User> {
+    return this.http.post<User>(`${this.backendUrl}/users/profile-image`, { imageUrl })
       .pipe(
-        tap(response => {
-          // Si hay una URL de imagen en la respuesta, actualizamos el perfil del usuario
-          if (response && response.profilePicture) {
-            const currentUser = this.authService.currentUserValue;
-            if (currentUser) {
-              const updatedUser = {
-                ...currentUser,
-                profilePicture: response.profilePicture
-              };
-              this.authService.updateCurrentUser(updatedUser);
-            }
+        tap(updatedUser => {
+          // Actualizar el usuario en el AuthService
+          const currentUser = this.authService.currentUserValue;
+          if (currentUser) {
+            const newUserData = { ...currentUser, ...updatedUser };
+            this.authService.updateCurrentUser(newUserData);
           }
         }),
         catchError(error => {
           console.error('Error al subir imagen:', error);
-          
-          // Para desarrollo, creamos una URL de imagen basada en el archivo seleccionado
-          const mockImageUrl = this.createImageUrlFromFormData(formData);
-          
-          // Actualizamos el usuario con la nueva imagen
-          const currentUser = this.authService.currentUserValue;
-          if (currentUser) {
-            const updatedUser = {
-              ...currentUser,
-              profilePicture: mockImageUrl
-            };
-            this.authService.updateCurrentUser(updatedUser);
-          }
-          
-          return of({ 
-            success: true, 
-            profilePicture: mockImageUrl,
-            message: 'Imagen actualizada correctamente'
-          });
+          return throwError(() => error);
         })
       );
   }

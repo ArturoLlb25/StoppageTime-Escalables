@@ -2,7 +2,8 @@ const { Router } = require('express');
 const { 
   getUserProfile, 
   updateUserProfile, 
-  changePassword 
+  changePassword,
+  uploadProfileImage
 } = require('../controllers/users');
 const { verifyJWT } = require('../middlewares/verifyJWT');
 
@@ -12,5 +13,6 @@ const router = Router();
 router.get('/profile', verifyJWT, getUserProfile);
 router.put('/profile', verifyJWT, updateUserProfile);
 router.put('/password', verifyJWT, changePassword);
+router.post('/profile-image', verifyJWT, uploadProfileImage);
 
 module.exports = router;

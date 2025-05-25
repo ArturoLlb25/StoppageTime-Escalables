@@ -1,4 +1,4 @@
-<div class="news-card" [routerLink]="['/news', news.id]">
+<div class="news-card" [routerLink]="['/news',news.id]">
   <div class="news-image">
     <img [src]="news.image || 'assets/images/placeholder.jpg'" [alt]="news.title">
     <div class="news-tags" *ngIf="news.tags && news.tags.length > 0">

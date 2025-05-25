@@ -15,7 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getToken();
   
   if (token && req.url.startsWith(environment.backendUrl)) {
-    // La clave está en el formato correcto del Bearer token
+    // Siempre usar formato Bearer para el token
     const authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });

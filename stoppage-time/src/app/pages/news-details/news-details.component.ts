@@ -31,11 +31,19 @@ export class NewsDetailsComponent implements OnInit {
     private authService: AuthService
   ) {}
   
+// En news-details.component.ts
   ngOnInit(): void {
+    console.log('Inicializando NewsDetailsComponent');
+    
     this.route.paramMap.subscribe(params => {
       const newsId = params.get('id');
+      console.log(`Parámetro ID recibido: "${newsId}"`);
+      
       if (newsId) {
         this.loadNews(newsId);
+      } else {
+        console.error('No se proporcionó ID en los parámetros');
+        this.router.navigate(['/not-found']);
       }
     });
     
@@ -49,16 +57,30 @@ export class NewsDetailsComponent implements OnInit {
   }
   
   loadNews(id: string): void {
-    this.newsService.getNewsById(id).subscribe(
-      news => {
-        this.news = news;
-        this.loadRelatedNews();
+    console.log(`Iniciando carga de noticia con ID: "${id}"`);
+    
+    if (!id || id === 'undefined') {
+      console.error('ID no válido en loadNews');
+      this.router.navigate(['/not-found']);
+      return;
+    }
+    
+    this.newsService.getNewsById(id).subscribe({
+      next: (news) => {
+        console.log('Noticia recibida:', news);
+        if (news) {
+          this.news = news;
+          this.loadRelatedNews();
+        } else {
+          console.error('Noticia recibida es null o undefined');
+          this.router.navigate(['/not-found']);
+        }
       },
-      error => {
+      error: (error) => {
         console.error('Error al cargar la noticia:', error);
         this.router.navigate(['/not-found']);
       }
-    );
+    });
   }
   
   loadRelatedNews(): void {

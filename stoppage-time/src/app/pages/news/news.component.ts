@@ -57,12 +57,14 @@ export class NewsComponent implements OnInit {
     });
   }
   
+  // En src/app/pages/news/news.component.ts
   loadNews(): void {
     this.loading = true;
     
     this.newsService.getAllNews().subscribe(
       news => {
-        this.allNews = news;
+        // Asegurarnos de que cada noticia tenga un ID válido
+        this.allNews = news.filter(item => item && item.id);
         this.applyFilters();
         
         // Solo establecer noticias destacadas si hay suficientes noticias

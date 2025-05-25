@@ -43,7 +43,7 @@ export class CommentsSectionComponent implements OnInit {
   @Input() newsId!: string;
   
   comments: Comment[] = [];
-  currentUser: User | null = null;
+  currentUser: any = null;
   isLoggedIn = false;
   isLoading = true;
   
@@ -85,17 +85,17 @@ export class CommentsSectionComponent implements OnInit {
     
     this.http.get<Comment[]>(endpoint).subscribe(
       comments => {
-      this.comments = comments;
-      this.isLoading = false;
+        this.comments = comments || [];
+        this.isLoading = false;
       },
       error => {
-      console.error('Error al cargar comentarios:', error);
-      this.comments = [];
-      this.isLoading = false;
-      this.snackBar.open('Error al cargar comentarios', 'Cerrar', {
-        duration: 3000,
-        panelClass: ['error-snackbar']
-      });
+        console.error('Error al cargar comentarios:', error);
+        this.comments = [];
+        this.isLoading = false;
+        this.snackBar.open('Error al cargar comentarios', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     );
   }
@@ -141,7 +141,14 @@ export class CommentsSectionComponent implements OnInit {
   submitReply(parentId: string): void {
     if (!this.replyContent.trim() || !this.isLoggedIn) return;
     
-    this.newsService.addComment(this.newsId, this.replyContent, parentId).subscribe(
+    const endpoint = this.isMatchComment 
+      ? `${environment.backendUrl}/matches/${this.newsId.substring(6)}/comments`
+      : `${environment.backendUrl}/news/${this.newsId}/comments`;
+    
+    this.http.post<Comment>(endpoint, {
+      content: this.replyContent,
+      parentId
+    }).subscribe(
       reply => {
         // Encontrar el comentario padre y añadir la respuesta
         const parentComment = this.comments.find(c => c.id === parentId);

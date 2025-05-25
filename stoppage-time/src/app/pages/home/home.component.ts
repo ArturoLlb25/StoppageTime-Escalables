@@ -60,15 +60,35 @@ export class HomeComponent implements OnInit {
     );
   }
   
-  loadFeaturedNews(): void {
+  private loadFeaturedNews(): void {
     this.newsService.getFeaturedNews().subscribe(
       news => {
-        this.featuredNews = news.slice(0, 3);
+        console.log('Noticias destacadas recibidas en home:', news);
+        // Verificar que cada noticia tiene un ID válido
+        this.featuredNews = news.filter(item => item && item.id);
+        
+        // Si no hay noticias destacadas válidas, intentar cargar todas las noticias
+        if (this.featuredNews.length === 0) {
+          this.loadAllNews();
+        }
       },
       error => {
         console.error('Error al cargar noticias destacadas:', error);
-        // Cargar datos de ejemplo
-        this.loadExampleNews();
+        this.featuredNews = [];
+      }
+    );
+  }
+
+  private loadAllNews(): void {
+    this.newsService.getAllNews().subscribe(
+      news => {
+        console.log('Todas las noticias recibidas en home:', news);
+        // Tomar las 3 primeras noticias si están disponibles
+        this.featuredNews = news.slice(0, 3);
+      },
+      error => {
+        console.error('Error al cargar todas las noticias:', error);
+        this.featuredNews = [];
       }
     );
   }

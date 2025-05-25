@@ -1,6 +1,7 @@
 const { response, request } = require('express');
 const bcrypt = require('bcrypt'); // Añade esta importación
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 const getUserProfile = async (req = request, res = response) => {
   const userId = req.user.id;
@@ -64,6 +65,46 @@ const updateUserProfile = async (req = request, res = response) => {
   }
 };
 
+const uploadProfileImage = async (req = request, res = response) => {
+  const userId = req.user.id;
+  const { imageUrl } = req.body;
+  
+  try {
+    // Verificar que userId sea válido
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({
+        msg: 'ID de usuario no válido'
+      });
+    }
+    
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        msg: 'Usuario no encontrado'
+      });
+    }
+    
+    // Actualizar la imagen de perfil
+    user.profilePicture = imageUrl;
+    await user.save();
+    
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      role: user.role
+    });
+    
+  } catch (error) {
+    console.log('Error al actualizar imagen de perfil:', error);
+    return res.status(500).json({
+      msg: 'Error en el servidor'
+    });
+  }
+};
+
 // Cambiar contraseña
 const changePassword = async (req = request, res = response) => {
   const userId = req.user.id;
@@ -101,5 +142,6 @@ const changePassword = async (req = request, res = response) => {
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  changePassword
+  changePassword,
+  uploadProfileImage
 };
