@@ -3,7 +3,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  /*padding: 1rem;*/
   margin-bottom: 1.5rem;
   background-color: #f5f5f5;
   border-radius: var(--border-radius-md);
@@ -21,6 +21,7 @@
   position: relative;
   min-width: 200px;
   max-width: 400px;
+  margin-right: 4rem;
 }
 
 .search-field input {
@@ -89,7 +90,7 @@
   
   .action-controls {
     margin-left: 0;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
   
   .search-field {
