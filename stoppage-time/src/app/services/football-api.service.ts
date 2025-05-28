@@ -150,6 +150,20 @@ export class FootballApiService {
     );
   }
 
+  // Obtener los últimos 5 partidos de un equipo (todas las competiciones)
+  getLastMatches(teamId: number): Observable<any[]> {
+    return this.http.get<any>(`${this.apiUrl}/fixtures`, {
+      headers: this.getHeaders(),
+      params: {
+        team: teamId.toString(),
+        last: '5'
+      }
+    }).pipe(
+      map((res: any) => res.response || []),
+      catchError(this.handleError('getLastMatches', []))
+    );
+  }
+
   // Manejo de errores
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {

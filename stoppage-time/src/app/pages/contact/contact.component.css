@@ -63,35 +63,6 @@
   color: #666;
 }
 
-.social-links h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-  color: var(--color-primary);
-}
-
-.social-icons {
-  display: flex;
-  gap: 1rem;
-}
-
-.social-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-secondary);
-  color: white;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.social-icon:hover {
-  background-color: var(--color-secondary-light);
-}
-
 /* Formulario de contacto */
 .contact-form-container h2 {
   margin-top: 0;
@@ -240,3 +211,6 @@
     padding: 1.5rem;
   }
 }
+
+/* Eliminar estilos de redes sociales */
+.social-links, .social-icons, .social-icon { display: none !important; }

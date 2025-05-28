@@ -36,21 +36,6 @@
       <p *ngFor="let paragraph of formatContent()">{{paragraph}}</p>
     </div>
     
-    <div class="share-section">
-      <h3>Compartir</h3>
-      <div class="social-buttons">
-        <a href="javascript:void(0)" class="social-button" (click)="shareOnFacebook()">
-          <span class="material-icons">facebook</span>
-        </a>
-        <a href="javascript:void(0)" class="social-button" (click)="shareOnTwitter()">
-          <span class="material-icons">twitter</span>
-        </a>
-        <a href="javascript:void(0)" class="social-button" (click)="shareOnWhatsapp()">
-          <span class="material-icons">whatsapp</span>
-        </a>
-      </div>
-    </div>
-    
     <div class="related-news" *ngIf="relatedNews.length > 0">
       <h3>Noticias relacionadas</h3>
       <div class="news-grid">
