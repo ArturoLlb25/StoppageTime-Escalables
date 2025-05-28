@@ -1,3 +1,4 @@
+<!-- src/app/pages/statistics/statistics.component.html -->
 <div class="statistics-container">
   <div class="container">
     <h1 class="page-title">Estadísticas</h1>
@@ -6,7 +7,7 @@
       <div class="filters-group">
         <div class="filter-select">
           <label for="league">Liga</label>
-          <select id="league" [(ngModel)]="selectedLeague" (change)="onLeagueChange()">
+          <select id="league" [(ngModel)]="selectedLeagueId" (change)="onLeagueChange()">
             <option *ngFor="let league of leagues" [value]="league.id">
               {{ league.name }} ({{ league.country }})
             </option>
@@ -17,26 +18,43 @@
           <label for="season">Temporada</label>
           <select id="season" [(ngModel)]="selectedSeason" (change)="onSeasonChange()">
             <option *ngFor="let season of seasons" [value]="season">
-              {{ season }}
+              {{ season }}-{{ season + 1 }}
             </option>
           </select>
         </div>
       </div>
       
-      <div class="league-info">
-        <ng-container *ngFor="let league of leagues">
-          <div *ngIf="league.id === selectedLeague" class="league-badge">
-            <img [src]="league.logo" [alt]="league.name" class="league-logo">
-            <div class="league-details">
-              <h2>{{ league.name }}</h2>
-              <p>{{ league.country }} - Temporada {{ selectedSeason }}</p>
-            </div>
+      <div class="league-info" *ngIf="currentLeague">
+        <div class="league-badge">
+          <img [src]="currentLeague.logo" [alt]="currentLeague.name" class="league-logo">
+          <div class="league-details">
+            <h2>{{ currentLeague.name }}</h2>
+            <p>{{ currentLeague.country }} - Temporada {{ selectedSeason }}-{{ selectedSeason + 1 }}</p>
           </div>
-        </ng-container>
+        </div>
       </div>
     </div>
     
-    <div class="tabs-container">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    
+    <!-- Error state -->
+    <div *ngIf="!loading && error" class="error-message-container">
+      <div class="error-card">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <h2>Ocurrió un error</h2>
+        <p>{{ errorMessage }}</p>
+        <button class="retry-button" (click)="loadLeagueStatistics()">
+          <mat-icon>refresh</mat-icon> Intentar de nuevo
+        </button>
+      </div>
+    </div>
+    
+    <!-- Content state -->
+    <div *ngIf="!loading && !error && leagueStatistics" class="statistics-content glass-card">
+      <!-- Tabs navigation -->
       <div class="tabs">
         <button 
           class="tab-btn" 
@@ -48,22 +66,30 @@
         </button>
         <button 
           class="tab-btn" 
-          [class.active]="activeTab === 'players'" 
-          (click)="setActiveTab('players')"
+          [class.active]="activeTab === 'scorers'" 
+          (click)="setActiveTab('scorers')"
         >
           <span class="material-icons">sports_soccer</span>
-          Jugadores
+          Goleadores
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'assisters'" 
+          (click)="setActiveTab('assisters')"
+        >
+          <span class="material-icons">auto_graph</span>
+          Asistencias
         </button>
       </div>
       
-      <div class="tab-content glass-card">
-        <div *ngIf="loading" class="loading-container">
-          <div class="spinner"></div>
-        </div>
-        
-        <!-- Clasificación -->
-        <div *ngIf="!loading && activeTab === 'standings'" class="standings-content">
-          <table class="standings-table">
+      <div class="tab-content">
+        <!-- Standings Tab -->
+        <div *ngIf="activeTab === 'standings'" class="standings-content">
+          <div *ngIf="leagueStatistics.standings.length === 0" class="no-data">
+            <p>No hay datos de clasificación disponibles para esta liga y temporada</p>
+          </div>
+          
+          <table *ngIf="leagueStatistics.standings.length > 0" class="standings-table">
             <thead>
               <tr>
                 <th>#</th>
@@ -79,11 +105,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let team of standings; let i = index" [class.highlight]="i < 4">
-                <td class="position" [class.qualification]="i < 4">{{ team.position }}</td>
+              <tr *ngFor="let team of leagueStatistics.standings; let i = index"
+                  [class.champion]="i === 0"
+                  [class.top-four]="i > 0 && i < 4">
+                <td class="position">{{ team.rank }}</td>
                 <td class="team-cell">
-                  <img [src]="team.team.logo || 'assets/images/placeholder.jpg'" [alt]="team.team.name" class="team-logo">
-                  <span class="team-name">{{ team.team.name }}</span>
+                  <img [src]="team.teamLogo || 'assets/images/placeholder.jpg'" [alt]="team.teamName" class="team-logo">
+                  <span class="team-name">{{ team.teamName }}</span>
                 </td>
                 <td>{{ team.played }}</td>
                 <td>{{ team.win }}</td>
@@ -99,7 +127,7 @@
             </tbody>
           </table>
           
-          <div class="legend">
+          <div class="legend" *ngIf="leagueStatistics.standings.length > 0">
             <div class="legend-item">
               <span class="legend-color qualification"></span>
               <span class="legend-text">Clasificación a torneos internacionales</span>
@@ -107,86 +135,94 @@
           </div>
         </div>
         
-        <!-- Jugadores -->
-        <div *ngIf="!loading && activeTab === 'players'" class="players-content">
-          <div class="players-tabs">
-            <button class="players-tab-btn active">Goleadores</button>
-            <button class="players-tab-btn">Asistencias</button>
-            <button class="players-tab-btn">Tarjetas</button>
+        <!-- Top Scorers Tab -->
+        <div *ngIf="activeTab === 'scorers'" class="players-content">
+          <div *ngIf="leagueStatistics.topScorers.length === 0" class="no-data">
+            <p>No hay datos de goleadores disponibles para esta liga y temporada</p>
           </div>
           
-          <!-- Tabla de goleadores -->
-          <div class="players-table-container">
-            <h3>Máximos Goleadores</h3>
-            <table class="players-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th class="player-cell-header">Jugador</th>
-                  <th>Equipo</th>
-                  <th>Goles</th>
-                  <th>Partidos</th>
-                  <th>Promedio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let player of topScorers; let i = index">
-                  <td>{{ i + 1 }}</td>
-                  <td class="player-cell">
-                    <img [src]="player.player.photo || 'assets/images/placeholder.jpg'" [alt]="player.player.name" class="player-photo">
-                    <div class="player-info">
-                      <span class="player-name">{{ player.player.name }}</span>
-                      <span class="player-nationality">{{ player.player.nationality }}</span>
-                    </div>
-                  </td>
-                  <td class="team-small-cell">
-                    <img [src]="player.team.logo || 'assets/images/placeholder.jpg'" [alt]="player.team.name" class="team-small-logo">
-                    <span class="team-small-name">{{ player.team.name }}</span>
-                  </td>
-                  <td class="highlight">{{ player.goals }}</td>
-                  <td>{{ player.appearances }}</td>
-                  <td>{{ (player.goals / player.appearances).toFixed(2) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <table *ngIf="leagueStatistics.topScorers.length > 0" class="players-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="player-cell-header">Jugador</th>
+                <th>Equipo</th>
+                <th>Goles</th>
+                <th>Asistencias</th>
+                <th>Nacionalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let player of leagueStatistics.topScorers; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td class="player-cell">
+                  <img [src]="player.photo || 'assets/images/placeholder.jpg'" [alt]="player.name" class="player-photo">
+                  <span class="player-name">{{ player.name }}</span>
+                </td>
+                <td class="team-small-cell">
+                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-small-logo">
+                  <span class="team-small-name">{{ player.team }}</span>
+                </td>
+                <td class="highlight">{{ player.goals }}</td>
+                <td>{{ player.assists }}</td>
+                <td>{{ player.nationality }}</td>
+              </tr>
+            </tbody>
+          </table>
           
-          <!-- Tabla de asistencias -->
-          <div class="players-table-container">
-            <h3>Máximos Asistentes</h3>
-            <table class="players-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th class="player-cell-header">Jugador</th>
-                  <th>Equipo</th>
-                  <th>Asistencias</th>
-                  <th>Partidos</th>
-                  <th>Promedio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let player of topAssists; let i = index">
-                  <td>{{ i + 1 }}</td>
-                  <td class="player-cell">
-                    <img [src]="player.player.photo || 'assets/images/placeholder.jpg'" [alt]="player.player.name" class="player-photo">
-                    <div class="player-info">
-                      <span class="player-name">{{ player.player.name }}</span>
-                      <span class="player-nationality">{{ player.player.nationality }}</span>
-                    </div>
-                  </td>
-                  <td class="team-small-cell">
-                    <img [src]="player.team.logo || 'assets/images/placeholder.jpg'" [alt]="player.team.name" class="team-small-logo">
-                    <span class="team-small-name">{{ player.team.name }}</span>
-                  </td>
-                  <td class="highlight">{{ player.assists }}</td>
-                  <td>{{ player.appearances }}</td>
-                  <td>{{ (player.assists / player.appearances).toFixed(2) }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="update-info" *ngIf="leagueStatistics.lastUpdated">
+            <p>Última actualización: {{ formatDate(leagueStatistics.lastUpdated) }}</p>
           </div>
         </div>
+        
+        <!-- Top Assisters Tab -->
+        <div *ngIf="activeTab === 'assisters'" class="players-content">
+          <div *ngIf="leagueStatistics.topAssisters.length === 0" class="no-data">
+            <p>No hay datos de asistentes disponibles para esta liga y temporada</p>
+          </div>
+          
+          <table *ngIf="leagueStatistics.topAssisters.length > 0" class="players-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="player-cell-header">Jugador</th>
+                <th>Equipo</th>
+                <th>Asistencias</th>
+                <th>Goles</th>
+                <th>Nacionalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let player of leagueStatistics.topAssisters; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td class="player-cell">
+                  <img [src]="player.photo || 'assets/images/placeholder.jpg'" [alt]="player.name" class="player-photo">
+                  <span class="player-name">{{ player.name }}</span>
+                </td>
+                <td class="team-small-cell">
+                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-small-logo">
+                  <span class="team-small-name">{{ player.team }}</span>
+                </td>
+                <td class="highlight">{{ player.assists }}</td>
+                <td>{{ player.goals }}</td>
+                <td>{{ player.nationality }}</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="update-info" *ngIf="leagueStatistics.lastUpdated">
+            <p>Última actualización: {{ formatDate(leagueStatistics.lastUpdated) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- No Data state -->
+    <div *ngIf="!loading && !error && !leagueStatistics" class="no-data-container">
+      <div class="no-data-card">
+        <mat-icon class="no-data-icon">sports_soccer</mat-icon>
+        <h2>No hay estadísticas disponibles</h2>
+        <p>No se encontraron estadísticas para la liga y temporada seleccionadas. Intenta seleccionar otra liga o temporada.</p>
       </div>
     </div>
   </div>

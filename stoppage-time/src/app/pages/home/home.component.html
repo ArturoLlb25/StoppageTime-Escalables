@@ -1,4 +1,4 @@
-<!-- En src/app/pages/home/home.component.html -->
+<!-- Update src/app/pages/home/home.component.html -->
 <div class="hero-section">
   <div class="container">
     <div class="hero-content">
@@ -68,7 +68,16 @@
       <a routerLink="/statistics" class="view-all-link">Ver más <span class="material-icons">arrow_forward</span></a>
     </div>
     
-    <div class="standings-tabs">
+    <div *ngIf="loadingStats" class="loading-center">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+    
+    <div *ngIf="!loadingStats && errorStats" class="error-message">
+      <p>No se pudieron cargar las estadísticas en este momento.</p>
+    </div>
+    
+    <div *ngIf="!loadingStats && !errorStats" class="standings-tabs">
       <div class="tabs-nav">
         <div 
           *ngFor="let tab of leagueTabs; let i = index" 
@@ -81,7 +90,11 @@
       
       <div class="tab-content">
         <div class="standings-table" *ngFor="let tab of leagueTabs; let i = index" [class.active]="activeTabIndex === i">
-          <table>
+          <div *ngIf="tab.standings.length === 0" class="no-data">
+            <p>No hay datos de clasificación disponibles para esta liga</p>
+          </div>
+          
+          <table *ngIf="tab.standings.length > 0">
             <thead>
               <tr>
                 <th>#</th>
@@ -94,11 +107,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let team of tab.standings.slice(0, 5); let j = index">
-                <td>{{j + 1}}</td>
+              <tr *ngFor="let team of tab.standings; let j = index">
+                <td>{{team.rank}}</td>
                 <td class="team-cell">
-                  <img [src]="team.team.logo || 'assets/images/placeholder.jpg'" [alt]="team.team.name">
-                  <span>{{team.team.name}}</span>
+                  <img [src]="team.teamLogo || 'assets/images/placeholder.jpg'" [alt]="team.teamName">
+                  <span>{{team.teamName}}</span>
                 </td>
                 <td>{{team.played}}</td>
                 <td>{{team.win}}</td>

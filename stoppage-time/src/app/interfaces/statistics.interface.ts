@@ -1,36 +1,38 @@
+// src/app/interfaces/statistics.interface.ts
 export interface LeagueStanding {
-  position: number;
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
+  rank: number;
+  teamId: number;
+  teamName: string;
+  teamLogo: string;
   points: number;
+  goalsDiff: number;
   played: number;
   win: number;
   draw: number;
   lose: number;
   goalsFor: number;
   goalsAgainst: number;
-  goalsDiff: number;
 }
 
-export interface PlayerStats {
-  player: {
-    id: number;
-    name: string;
-    photo: string;
-    nationality: string;
-    position: string;
-  };
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
+export interface PlayerStat {
+  playerId: number;
+  name: string;
+  photo: string;
+  nationality: string;
+  team: string;
+  teamLogo: string;
   goals: number;
   assists: number;
-  yellowCards: number;
-  redCards: number;
-  appearances: number;
+}
+
+export interface LeagueStatistics {
+  leagueId: number;
+  leagueName: string;
+  leagueCountry: string;
+  leagueLogo: string;
+  season: number;
+  standings: LeagueStanding[];
+  topScorers: PlayerStat[];
+  topAssisters: PlayerStat[];
+  lastUpdated: Date;
 }
