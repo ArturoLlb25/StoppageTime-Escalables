@@ -1,3 +1,4 @@
+// En src/app/services/football-api.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -10,6 +11,7 @@ import { Match, League, Player } from '../interfaces/match.interface';
 })
 export class FootballApiService {
   private apiUrl = environment.apiUrl;
+  private backendUrl = environment.backendUrl; // Añadido para usar el backend
   private apiKey = environment.apiKey;
 
   constructor(private http: HttpClient) { }
@@ -21,42 +23,48 @@ export class FootballApiService {
     });
   }
 
-  // Obtener partidos en vivo
-  getLiveMatches(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/fixtures`, {
-      headers: this.getHeaders(),
-      params: {
-        live: 'all'
-      }
-    }).pipe(
+  // Obtener partidos desde nuestro backend
+  getLiveMatches(): Observable<Match[]> {
+    return this.http.get<any[]>(`${this.backendUrl}/matches`).pipe(
+      map(matches => this.mapToMatchInterface(matches)),
       catchError(this.handleError('getLiveMatches', []))
     );
   }
 
-  // Obtener partidos por fecha
-  getMatchesByDate(date: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/fixtures`, {
-      headers: this.getHeaders(),
-      params: {
-        date
-      }
-    }).pipe(
+  // Obtener partidos por fecha (ahora desde nuestro backend)
+  getMatchesByDate(date: string): Observable<Match[]> {
+    return this.http.get<any[]>(`${this.backendUrl}/matches?date=${date}`).pipe(
+      map(matches => this.mapToMatchInterface(matches)),
       catchError(this.handleError('getMatchesByDate', []))
     );
   }
 
   // Obtener detalles de un partido
   getMatchDetails(matchId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/fixtures`, {
-      headers: this.getHeaders(),
-      params: {
-        id: matchId.toString()
-      }
-    }).pipe(
+    return this.http.get<any>(`${this.backendUrl}/matches/${matchId}`).pipe(
       catchError(this.handleError('getMatchDetails', {}))
     );
   }
 
+  // Transformar la respuesta del backend al formato esperado por el frontend
+  private mapToMatchInterface(apiMatches: any[]): Match[] {
+    return apiMatches.map(match => {
+      return {
+        id: match.id,
+        date: match.date,
+        time: match.time,
+        status: match.status,
+        round: match.round,
+        league: match.league,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        score: match.score
+      };
+    });
+  }
+
+  // Mantener los métodos existentes que acceden directamente a la API externa
+  
   // Obtener estadísticas de un partido
   getMatchStatistics(matchId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/fixtures/statistics`, {

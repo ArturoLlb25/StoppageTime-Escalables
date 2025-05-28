@@ -1,3 +1,4 @@
+// En src/app/pages/matches/matches.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,11 +6,7 @@ import { ControlsComponent } from '../../components/controls/controls.component'
 import { MatchCardComponent } from '../../components/match-card/match-card.component';
 import { FootballApiService } from '../../services/football-api.service';
 import { Match } from '../../interfaces/match.interface';
-
-interface League {
-  id: number;
-  name: string;
-}
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-matches',
@@ -18,7 +15,8 @@ interface League {
     CommonModule,
     FormsModule,
     ControlsComponent,
-    MatchCardComponent
+    MatchCardComponent,
+    MatIcon
   ],
   templateUrl: './matches.component.html',
   styleUrls: ['./matches.component.css']
@@ -32,12 +30,14 @@ export class MatchesComponent implements OnInit {
   
   loading = true;
   noMatchesFound = false;
+  error = false;
+  errorMessage = '';
   
   filterType = 'all';
   selectedLeague = 'all';
   searchQuery = '';
   
-  leagues: League[] = [
+  leagues: { id: number, name: string }[] = [
     { id: 262, name: 'Liga MX' },
     { id: 39, name: 'Premier League' },
     { id: 140, name: 'La Liga' },
@@ -60,14 +60,28 @@ export class MatchesComponent implements OnInit {
   
   loadMatches(): void {
     this.loading = true;
+    this.error = false;
+    this.errorMessage = '';
     
-    // En un caso real, obtendríamos estos datos de la API
-    // Por ahora, usamos datos de ejemplo
-    setTimeout(() => {
-      this.loadExampleMatches();
-      this.filterMatches();
-      this.loading = false;
-    }, 1000);
+    this.footballApiService.getLiveMatches().subscribe({
+      next: (matches) => {
+        this.allMatches = matches || [];
+        this.filterMatches();
+        this.loading = false;
+        
+        // Verificar si hay partidos
+        if (this.allMatches.length === 0) {
+          this.noMatchesFound = true;
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar partidos:', error);
+        this.loading = false;
+        this.error = true;
+        this.errorMessage = 'Error al cargar los partidos. Por favor, inténtalo de nuevo más tarde.';
+        this.noMatchesFound = true;
+      }
+    });
   }
   
   onSearch(query: string): void {
@@ -171,7 +185,7 @@ export class MatchesComponent implements OnInit {
         case 'live':
           this.liveMatches = this.liveMatches.slice(start, end);
           break;
-          case 'today':
+        case 'today':
           this.todayMatches = this.todayMatches.slice(start, end);
           break;
         case 'upcoming':
@@ -181,232 +195,6 @@ export class MatchesComponent implements OnInit {
           this.finishedMatches = this.finishedMatches.slice(start, end);
           break;
       }
-    }
-  }
-  
-  private loadExampleMatches(): void {
-    // Datos de ejemplo - En un caso real, estos vendrían de la API
-    this.allMatches = [
-      // Partidos en vivo
-      {
-        id: 1,
-        date: '2025-05-23',
-        time: '20:00',
-        status: 'LIVE',
-        league: {
-          id: 262,
-          name: 'Liga MX',
-          logo: 'https://media-4.api-sports.io/football/leagues/262.png',
-          country: 'Mexico'
-        },
-        homeTeam: {
-          id: 2302,
-          name: 'América',
-          logo: 'https://media-4.api-sports.io/football/teams/2302.png'
-        },
-        awayTeam: {
-          id: 2287,
-          name: 'Chivas',
-          logo: 'https://media-4.api-sports.io/football/teams/2287.png'
-        },
-        score: {
-          home: 2,
-          away: 1
-        }
-      },
-      {
-        id: 2,
-        date: '2025-05-23',
-        time: '18:30',
-        status: 'LIVE',
-        league: {
-          id: 39,
-          name: 'Premier League',
-          logo: 'https://media-4.api-sports.io/football/leagues/39.png',
-          country: 'England'
-        },
-        homeTeam: {
-          id: 40,
-          name: 'Liverpool',
-          logo: 'https://media-4.api-sports.io/football/teams/40.png'
-        },
-        awayTeam: {
-          id: 33,
-          name: 'Manchester United',
-          logo: 'https://media-4.api-sports.io/football/teams/33.png'
-        },
-        score: {
-          home: 3,
-          away: 1
-        }
-      },
-      
-      // Partidos programados para hoy
-      {
-        id: 3,
-        date: '2025-05-23',
-        time: '21:00',
-        status: 'SCHEDULED',
-        league: {
-          id: 140,
-          name: 'La Liga',
-          logo: 'https://media-4.api-sports.io/football/leagues/140.png',
-          country: 'Spain'
-        },
-        homeTeam: {
-          id: 541,
-          name: 'Real Madrid',
-          logo: 'https://media-4.api-sports.io/football/teams/541.png'
-        },
-        awayTeam: {
-          id: 529,
-          name: 'Barcelona',
-          logo: 'https://media-4.api-sports.io/football/teams/529.png'
-        }
-      },
-      {
-        id: 4,
-        date: '2025-05-23',
-        time: '22:00',
-        status: 'SCHEDULED',
-        league: {
-          id: 61,
-          name: 'Ligue 1',
-          logo: 'https://media-4.api-sports.io/football/leagues/61.png',
-          country: 'France'
-        },
-        homeTeam: {
-          id: 85,
-          name: 'Paris Saint Germain',
-          logo: 'https://media-4.api-sports.io/football/teams/85.png'
-        },
-        awayTeam: {
-          id: 91,
-          name: 'Monaco',
-          logo: 'https://media-4.api-sports.io/football/teams/91.png'
-        }
-      },
-      
-      // Partidos próximos
-      {
-        id: 5,
-        date: '2025-05-24',
-        time: '16:00',
-        status: 'SCHEDULED',
-        league: {
-          id: 78,
-          name: 'Bundesliga',
-          logo: 'https://media-4.api-sports.io/football/leagues/78.png',
-          country: 'Germany'
-        },
-        homeTeam: {
-          id: 157,
-          name: 'Bayern Munich',
-          logo: 'https://media-4.api-sports.io/football/teams/157.png'
-        },
-        awayTeam: {
-          id: 165,
-          name: 'Borussia Dortmund',
-          logo: 'https://media-4.api-sports.io/football/teams/165.png'
-        }
-      },
-      {
-        id: 6,
-        date: '2025-05-24',
-        time: '19:00',
-        status: 'SCHEDULED',
-        league: {
-          id: 135,
-          name: 'Serie A',
-          logo: 'https://media-4.api-sports.io/football/leagues/135.png',
-          country: 'Italy'
-        },
-        homeTeam: {
-          id: 489,
-          name: 'AC Milan',
-          logo: 'https://media-4.api-sports.io/football/teams/489.png'
-        },
-        awayTeam: {
-          id: 505,
-          name: 'Inter',
-          logo: 'https://media-4.api-sports.io/football/teams/505.png'
-        }
-      },
-      
-      // Partidos finalizados
-      {
-        id: 7,
-        date: '2025-05-22',
-        time: '19:30',
-        status: 'FINISHED',
-        league: {
-          id: 39,
-          name: 'Premier League',
-          logo: 'https://media-4.api-sports.io/football/leagues/39.png',
-          country: 'England'
-        },
-        homeTeam: {
-          id: 42,
-          name: 'Arsenal',
-          logo: 'https://media-4.api-sports.io/football/teams/42.png'
-        },
-        awayTeam: {
-          id: 47,
-          name: 'Tottenham',
-          logo: 'https://media-4.api-sports.io/football/teams/47.png'
-        },
-        score: {
-          home: 2,
-          away: 2
-        }
-      },
-      {
-        id: 8,
-        date: '2025-05-22',
-        time: '17:00',
-        status: 'FINISHED',
-        league: {
-          id: 140,
-          name: 'La Liga',
-          logo: 'https://media-4.api-sports.io/football/leagues/140.png',
-          country: 'Spain'
-        },
-        homeTeam: {
-          id: 530,
-          name: 'Atlético Madrid',
-          logo: 'https://media-4.api-sports.io/football/teams/530.png'
-        },
-        awayTeam: {
-          id: 538,
-          name: 'Sevilla',
-          logo: 'https://media-4.api-sports.io/football/teams/538.png'
-        },
-        score: {
-          home: 3,
-          away: 0
-        }
-      }
-    ];
-    
-    // Agregar más partidos de ejemplo para mostrar la paginación
-    for (let i = 9; i <= 20; i++) {
-      this.allMatches.push({
-        id: i,
-        date: '2025-05-25',
-        time: `${Math.floor(Math.random() * 12 + 12)}:${Math.random() > 0.5 ? '00' : '30'}`,
-        status: 'SCHEDULED',
-        league: this.leagues[Math.floor(Math.random() * this.leagues.length)],
-        homeTeam: {
-          id: 1000 + i,
-          name: `Equipo Local ${i}`,
-          logo: 'https://via.placeholder.com/40'
-        },
-        awayTeam: {
-          id: 2000 + i,
-          name: `Equipo Visitante ${i}`,
-          logo: 'https://via.placeholder.com/40'
-        }
-      });
     }
   }
 }

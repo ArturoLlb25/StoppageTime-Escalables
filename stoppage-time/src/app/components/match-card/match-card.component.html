@@ -1,4 +1,5 @@
-<div class="match-card" [ngClass]="{'live': match.status === 'LIVE','azul':match.status!=='LIVE'}"  [routerLink]="['/matches', match.id]">
+<!-- src/app/components/match-card/match-card.component.html -->
+<div class="match-card" [ngClass]="{'live': match.status === 'LIVE','azul':match.status!=='LIVE'}" [routerLink]="['/matches', match.id]">
   <div class="match-status">
     <span *ngIf="match.status === 'LIVE'" class="status-live">EN VIVO</span>
     <span *ngIf="match.status === 'FINISHED'" class="status-finished">FINALIZADO</span>
@@ -7,7 +8,7 @@
   </div>
   
   <div class="match-league">
-    <img *ngIf="match.league.logo" [src]="match.league.logo" [alt]="match.league.name" class="league-logo">
+    <img *ngIf="match.league.logo" [src]="match.league.logo || 'assets/images/placeholder.jpg'" [alt]="match.league.name" class="league-logo">
     <span>{{match.league.name}}</span>
   </div>
   

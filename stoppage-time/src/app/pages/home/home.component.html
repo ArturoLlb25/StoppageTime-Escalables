@@ -1,3 +1,4 @@
+<!-- En src/app/pages/home/home.component.html -->
 <div class="hero-section">
   <div class="container">
     <div class="hero-content">
@@ -15,18 +16,25 @@
       <a routerLink="/matches" class="view-all-link">Ver todos <span class="material-icons">arrow_forward</span></a>
     </div>
     
-    <div *ngIf="liveMatches.length > 0; else noLiveMatches" class="matches-grid">
+    <div *ngIf="loadingMatches" class="loading-center">
+      <div class="spinner"></div>
+      <p>Cargando partidos...</p>
+    </div>
+    
+    <div *ngIf="!loadingMatches && errorMatches" class="error-message">
+      <p>No se pudieron cargar los partidos en este momento. Inténtalo de nuevo más tarde.</p>
+    </div>
+    
+    <div *ngIf="!loadingMatches && !errorMatches && liveMatches.length > 0" class="matches-grid">
       <app-match-card 
         *ngFor="let match of liveMatches" 
         [match]="match">
       </app-match-card>
     </div>
     
-    <ng-template #noLiveMatches>
-      <div class="no-content">
-        <p>No hay partidos en vivo en este momento</p>
-      </div>
-    </ng-template>
+    <div *ngIf="!loadingMatches && !errorMatches && liveMatches.length === 0" class="no-content">
+      <p>No hay partidos disponibles en este momento</p>
+    </div>
   </section>
   
   <!-- Noticias Destacadas -->
@@ -36,18 +44,21 @@
       <a routerLink="/news" class="view-all-link">Ver todas <span class="material-icons">arrow_forward</span></a>
     </div>
     
-    <div *ngIf="featuredNews.length > 0; else noNews" class="news-grid">
+    <div *ngIf="loadingNews" class="loading-center">
+      <div class="spinner"></div>
+      <p>Cargando noticias...</p>
+    </div>
+    
+    <div *ngIf="!loadingNews && featuredNews.length > 0" class="news-grid">
       <app-news-card 
         *ngFor="let news of featuredNews" 
         [news]="news">
       </app-news-card>
     </div>
     
-    <ng-template #noNews>
-      <div class="no-content">
-        <p>No hay noticias disponibles</p>
-      </div>
-    </ng-template>
+    <div *ngIf="!loadingNews && featuredNews.length === 0" class="no-content">
+      <p>No hay noticias disponibles</p>
+    </div>
   </section>
   
   <!-- Estadísticas -->

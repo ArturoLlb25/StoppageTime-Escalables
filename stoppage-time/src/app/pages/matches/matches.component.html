@@ -26,11 +26,34 @@
     </div>
   </app-controls>
   
+  <!-- Estado de carga -->
   <div *ngIf="loading" class="loading-container">
     <div class="spinner"></div>
   </div>
   
-  <ng-container *ngIf="!loading">
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="error-message-container">
+    <div class="error-card">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h2>Ocurrió un error</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="retry-button" (click)="loadMatches()">
+        <mat-icon>refresh</mat-icon> Intentar de nuevo
+      </button>
+    </div>
+  </div>
+  
+  <!-- Sin partidos disponibles -->
+  <div *ngIf="!loading && !error && noMatchesFound" class="no-matches">
+    <span class="material-icons">sports_soccer</span>
+    <p>No hay partidos disponibles para hoy con los filtros seleccionados</p>
+    <button class="reset-button" (click)="resetFilters()">
+      Limpiar filtros
+    </button>
+  </div>
+  
+  <!-- Contenido principal con partidos -->
+  <ng-container *ngIf="!loading && !error && !noMatchesFound">
     <!-- Partidos en vivo -->
     <div *ngIf="liveMatches.length > 0" class="match-section">
       <h2 class="section-title">
@@ -90,17 +113,10 @@
         </app-match-card>
       </div>
     </div>
-    
-    <div *ngIf="noMatchesFound" class="no-matches">
-      <span class="material-icons">sports_soccer</span>
-      <p>No se encontraron partidos con los filtros seleccionados</p>
-      <button class="reset-button" (click)="resetFilters()">
-        Limpiar filtros
-      </button>
-    </div>
   </ng-container>
   
-  <div class="pagination" *ngIf="totalMatches > pageSize">
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="totalMatches > pageSize && !loading && !error && !noMatchesFound">
     <button 
       class="pagination-button" 
       [disabled]="currentPage === 0" 

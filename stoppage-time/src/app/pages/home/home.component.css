@@ -181,3 +181,48 @@ th {
     flex-basis: 50%;
   }
 }
+
+
+.loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.loading-center .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-secondary);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  background-color: #fff3f3;
+  color: var(--color-accent);
+  padding: 1rem;
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.no-content {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f9f9f9;
+  border-radius: var(--border-radius-md);
+  color: #888;
+  margin-bottom: 1.5rem;
+}

@@ -1,6 +1,8 @@
+// En src/config/server.js
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./database');
+const { scheduleMatchUpdates } = require('../controllers/matches');
 
 class Server {
   constructor() {
@@ -11,6 +13,7 @@ class Server {
     this.authPath = '/api/auth';
     this.newsPath = '/api/news';
     this.usersPath = '/api/users';
+    this.matchesPath = '/api/matches';
 
     // Middlewares
     this.app.use(cors());
@@ -21,13 +24,16 @@ class Server {
 
     // Definir rutas
     this.routes();
+    
+    // Iniciar actualizaciones programadas de partidos
+    scheduleMatchUpdates();
   }
 
   routes() {
     this.app.use(this.authPath, require("../routes/auth"));
     this.app.use(this.newsPath, require("../routes/news"));
     this.app.use(this.usersPath, require("../routes/users"));
-    this.app.use('/api/matches', require("../routes/matches")); // Añadir esta línea
+    this.app.use(this.matchesPath, require("../routes/matches"));
   }
 
   listen() {

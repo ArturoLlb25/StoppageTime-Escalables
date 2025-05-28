@@ -1,3 +1,4 @@
+// En src/app/pages/home/home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -35,6 +36,11 @@ export class HomeComponent implements OnInit {
   leagueTabs: LeagueTab[] = [];
   activeTabIndex = 0;
   
+  // Estados de carga y error
+  loadingMatches = true;
+  loadingNews = true;
+  errorMatches = false;
+  
   constructor(
     private footballApiService: FootballApiService,
     private newsService: NewsService
@@ -47,20 +53,37 @@ export class HomeComponent implements OnInit {
   }
   
   loadLiveMatches(): void {
-    this.footballApiService.getLiveMatches().subscribe(
-      response => {
-        // En un caso real, transformaríamos la respuesta de la API
-        // Por ahora, usaremos datos de ejemplo
-        this.loadExampleMatches();
+    this.loadingMatches = true;
+    this.errorMatches = false;
+    
+    this.footballApiService.getLiveMatches().subscribe({
+      next: (matches) => {
+        console.log('Partidos cargados en Home:', matches);
+        // Filtrar y mostrar máximo 3 partidos (priorizando los que están en vivo)
+        const liveOnes = matches.filter(match => match.status === 'LIVE');
+        const scheduledOnes = matches.filter(match => match.status === 'SCHEDULED');
+        const finishedOnes = matches.filter(match => match.status === 'FINISHED');
+        
+        // Combinar dando prioridad a los partidos en vivo
+        let combinedMatches = [...liveOnes, ...scheduledOnes, ...finishedOnes];
+        
+        // Tomar solo los primeros 3
+        this.liveMatches = combinedMatches.slice(0, 3);
+        this.loadingMatches = false;
       },
-      error => {
-        console.error('Error al cargar partidos en vivo:', error);
+      error: (error) => {
+        console.error('Error al cargar partidos en Home:', error);
+        this.loadingMatches = false;
+        this.errorMatches = true;
+        // Si hay error, cargar datos de ejemplo como fallback
         this.loadExampleMatches();
       }
-    );
+    });
   }
   
   private loadFeaturedNews(): void {
+    this.loadingNews = true;
+    
     this.newsService.getFeaturedNews().subscribe(
       news => {
         console.log('Noticias destacadas recibidas en home:', news);
@@ -71,10 +94,12 @@ export class HomeComponent implements OnInit {
         if (this.featuredNews.length === 0) {
           this.loadAllNews();
         }
+        this.loadingNews = false;
       },
       error => {
         console.error('Error al cargar noticias destacadas:', error);
         this.featuredNews = [];
+        this.loadingNews = false;
       }
     );
   }
@@ -103,7 +128,9 @@ export class HomeComponent implements OnInit {
     this.activeTabIndex = index;
   }
   
+  // Este método solo se utiliza como fallback en caso de error
   private loadExampleMatches(): void {
+    // Estos son datos de ejemplo que solo se mostrarán si hay un error al cargar desde la API
     this.liveMatches = [
       {
         id: 1,
@@ -182,42 +209,8 @@ export class HomeComponent implements OnInit {
     ];
   }
   
-  private loadExampleNews(): void {
-    this.featuredNews = [
-      {
-        id: '1',
-        title: 'El América vence al Monterrey y avanza a la final',
-        content: 'En un emocionante partido, el América derrotó al Monterrey 2-1 en el global y avanza a la final del torneo.',
-        summary: 'Las Águilas vencieron a Rayados en un duelo lleno de emociones.',
-        image: 'https://via.placeholder.com/800x500?text=America+vs+Monterrey',
-        author: 'Juan Pérez',
-        publishDate: new Date('2025-05-20'),
-        tags: ['Liga MX', 'América', 'Monterrey']
-      },
-      {
-        id: '2',
-        title: 'Mbappé anuncia su salida del PSG al final de temporada',
-        content: 'El delantero francés Kylian Mbappé anunció oficialmente que dejará el París Saint-Germain al final de la temporada, con rumores que lo vinculan al Real Madrid.',
-        summary: 'El delantero francés pondrá fin a su etapa de 7 años en el club parisino.',
-        image: 'https://via.placeholder.com/800x500?text=Mbappe+PSG',
-        author: 'Carlos Rodríguez',
-        publishDate: new Date('2025-05-21'),
-        tags: ['Ligue 1', 'PSG', 'Mbappé']
-      },
-      {
-        id: '3',
-        title: 'Manchester City se corona campeón de la Premier League',
-        content: 'El Manchester City se ha coronado campeón de la Premier League por cuarta temporada consecutiva tras vencer al West Ham en la última jornada.',
-        summary: 'El equipo de Guardiola consigue su cuarto título consecutivo de Premier.',
-        image: 'https://via.placeholder.com/800x500?text=Manchester+City+Campeon',
-        author: 'Ana García',
-        publishDate: new Date('2025-05-19'),
-        tags: ['Premier League', 'Manchester City']
-      }
-    ];
-  }
-  
   private loadExampleStandings(): void {
+    // Datos de ejemplo para las clasificaciones
     this.leagueTabs = [
       {
         id: 262,

@@ -1,7 +1,9 @@
-// En routes/matches.js
+// En src/routes/matches.js
 const { Router } = require('express');
 const { verifyJWT } = require('../middlewares/verifyJWT');
 const { 
+  getMatches,
+  getMatchById,
   getMatchComments,
   addMatchComment,
   updateMatchComment,
@@ -10,6 +12,13 @@ const {
 
 const router = Router();
 
+// Ruta para obtener todos los partidos
+router.get('/', getMatches);
+
+// Ruta para obtener un partido específico
+router.get('/:id', getMatchById);
+
+// Rutas de comentarios
 router.get('/:matchId/comments', getMatchComments);
 router.post('/:matchId/comments', verifyJWT, addMatchComment);
 router.put('/:matchId/comments/:commentId', verifyJWT, updateMatchComment);
