@@ -4,16 +4,17 @@
   <div class="profile-grid">
     <!-- Columna izquierda - Información de Perfil -->
     <mat-card class="profile-section">
-      <mat-card-header>
+      <div class="profile-header">
         <mat-card-title>Información Personal</mat-card-title>
         <button 
           mat-stroked-button 
           color="primary" 
           *ngIf="!isEditingProfile" 
-          (click)="toggleEditProfile()">
+          (click)="toggleEditProfile()"
+          class="edit-profile-btn">
           <mat-icon>edit</mat-icon> Editar
         </button>
-      </mat-card-header>
+      </div>
       
       <mat-card-content>
         <!-- Vista de perfil -->

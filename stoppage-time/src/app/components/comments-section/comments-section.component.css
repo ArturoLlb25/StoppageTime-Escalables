@@ -1,11 +1,17 @@
 .comments-section {
   margin-top: 2rem;
   margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  padding-bottom: 1rem;
 }
 
 .comments-title {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   margin-bottom: 1rem;
+  font-weight: 700;
+  color: #222;
 }
 
 .full-width {
@@ -41,38 +47,115 @@
 
 /* Estilos para los comentarios */
 .comment {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.2rem;
 }
 
 .comment-card {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  border: 1px solid #e8eaf0;
+  background: #f8fafc;
+  transition: box-shadow 0.2s;
+  padding: 0.5rem 0.7rem 0.7rem 0.7rem;
+}
+
+.comment-card:hover {
+  box-shadow: 0 2px 16px rgba(25,118,210,0.09);
 }
 
 .comment-text {
-  padding: 0.5rem 0;
-  line-height: 1.5;
+  padding: 0.5rem 0 0.2rem 0;
+  line-height: 1.6;
+  font-size: 1.05rem;
+  color: #222;
 }
 
 .user-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1976d2;
+}
+
+mat-card-header img[matCardAvatar] {
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border: 2px solid #e3e3e3;
+  margin-right: 0.7rem;
+}
+
+mat-card-header {
+  align-items: center;
+  gap: 0.7rem;
+}
+
+mat-card-subtitle {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+mat-card-actions {
+  margin-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+mat-card-actions button {
+  font-size: 0.95rem;
   font-weight: 500;
+  border-radius: 6px;
+  padding: 0.2rem 0.8rem;
+  min-width: 0;
+}
+
+mat-card-actions mat-icon {
+  font-size: 1.1rem;
+  vertical-align: middle;
 }
 
 /* Estilos para las respuestas */
 .replies {
-  padding-left: 2rem;
-  margin-top: 1rem;
+  padding-left: 2.2rem;
+  margin-top: 0.5rem;
+  border-left: 2px solid #e3e3e3;
 }
 
 .reply-card {
   margin-bottom: 0.5rem;
-  background-color: #f9f9f9;
+  background-color: #f4f7fb;
+  border-radius: 10px;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  padding: 0.4rem 0.7rem 0.7rem 0.7rem;
+}
+
+.reply-card .user-name {
+  color: #388e3c;
+}
+
+.reply-card mat-card-content {
+  font-size: 0.98rem;
+}
+
+.reply-card mat-card-actions button {
+  font-size: 0.92rem;
 }
 
 /* Formularios de respuesta y edición */
 .reply-form, .edit-form {
   margin-top: 1rem;
   padding: 0 1rem 1rem 1rem;
+  background: #f5f7fa;
+  border-radius: 8px;
+  border: 1px solid #e3e3e3;
+}
+
+.reply-form mat-form-field, .edit-form mat-form-field {
+  margin-bottom: 0.5rem;
 }
 
 .form-actions {
@@ -84,9 +167,11 @@
 
 /* Botón de enviar comentario */
 .submit-button {
-  align-self: flex-end;
-  margin-left: auto;
-  display: block;
+  min-width: 180px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
 }
 
 /* Mensaje para usuarios no autenticados */
@@ -131,5 +216,16 @@
   
   .form-actions button {
     width: 100%;
+  }
+  .comment-card, .reply-card {
+    padding: 0.2rem 0.4rem 0.5rem 0.4rem;
+  }
+  .submit-row {
+    justify-content: stretch;
+  }
+  .submit-button {
+    width: 100%;
+    min-width: unset;
+    margin-top: 0.5rem;
   }
 }

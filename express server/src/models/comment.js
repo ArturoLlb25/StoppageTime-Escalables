@@ -29,9 +29,14 @@ const commentSchema = new Schema({
     default: Date.now
   },
   parentId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Comment',
-    default: null
+    type: String,
+    default: null,
+    validate: {
+      validator: function(v) {
+        return v === null || mongoose.Types.ObjectId.isValid(v);
+      },
+      message: props => `${props.value} no es un ObjectId válido!`
+    }
   }
 });
 

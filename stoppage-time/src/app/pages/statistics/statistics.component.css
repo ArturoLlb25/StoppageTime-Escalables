@@ -235,93 +235,73 @@
 .players-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .players-table th,
 .players-table td {
-  padding: 0.75rem;
+  padding: 0.75rem 0.5rem;
   text-align: center;
-  border-bottom: 1px solid #eee;
-  vertical-align: middle;
+  border-bottom: 1px solid #f2f2f2;
 }
 
 .players-table th {
-  font-weight: 500;
-  color: #666;
-  font-size: 0.9rem;
-  white-space: nowrap;
+  font-weight: 600;
+  color: #888;
+  font-size: 0.95rem;
+  background: #fafbfc;
 }
 
 .players-table tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: #f5f8fa;
 }
 
-.players-table .player-cell-header {
-  text-align: left;
-  padding-left: 1rem;
-}
-
-.players-table .player-cell {
+.player-cell {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  text-align: left;
+  justify-content: center;
   min-width: 180px;
 }
 
-.players-table .player-photo {
-  width: 32px;
-  height: 32px;
+.player-photo {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #e3e3e3;
+  background: #fff;
   flex-shrink: 0;
 }
 
-.players-table .player-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.players-table .player-name {
-  font-weight: 500;
+.player-name {
+  font-weight: 600;
+  color: #222;
+  font-size: 1.05rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  text-align: center;
+  margin: 0 0.5rem;
 }
 
-.players-table .player-nationality {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.players-table .team-small-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-align: left;
-  min-width: 120px;
-}
-
-.players-table .team-small-logo {
-  width: 22px;
-  height: 22px;
+.team-logo-inline {
+  width: 26px;
+  height: 26px;
   object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e3e3e3;
   flex-shrink: 0;
 }
 
-.players-table .team-small-name {
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 400;
-}
-
-.players-table .highlight {
-  font-weight: 700;
+.highlight {
   color: var(--color-secondary);
+  font-weight: 700;
   font-size: 1.1rem;
 }
 
@@ -465,41 +445,42 @@
   .standings-table td,
   .players-table th,
   .players-table td {
-    padding: 0.5rem;
+    padding: 0.5rem 0.2rem;
+    font-size: 0.95rem;
   }
   
   .standings-table .team-cell,
   .players-table .player-cell {
-    min-width: 150px;
-  }
-  
-  .players-table .player-photo {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .players-table .team-small-cell {
     min-width: 120px;
   }
   
-  .players-table .player-cell {
-    min-width: 120px;
-    gap: 0.5rem;
-  }
-  
   .players-table .player-photo {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
+    margin-right: 0.5rem;
   }
   
-  .players-table .team-small-cell {
-    min-width: 90px;
+  .players-table .team-logo-inline {
+    width: 20px;
+    height: 20px;
+    margin-left: 0.5rem;
+  }
+  
+  .players-table .player-name {
+    max-width: 70px;
+    font-size: 0.95rem;
+  }
+  
+  .player-cell {
+    min-width: 120px;
     gap: 0.3rem;
+    justify-content: center;
   }
   
-  .players-table .team-small-logo {
-    width: 18px;
-    height: 18px;
+  .players-table th:first-child,
+  .players-table td:first-child {
+    padding-left: 1rem;
+    padding-right: 0.5rem;
   }
 }
 
@@ -532,26 +513,17 @@
   }
   
   .players-table .player-cell,
-  .players-table .team-small-cell {
+  .players-table .team-logo-inline {
     min-width: 120px;
   }
 }
 
-.players-table .player-cell,
-.players-table .team-small-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.players-table .player-name,
-.players-table .team-small-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-block;
-  max-width: 120px;
+.players-table th:first-child,
+.players-table td:first-child {
+  padding-left: 2rem;
+  padding-right: 1rem;
+  text-align: right;
+  width: 40px;
+  font-weight: 700;
+  color: #888;
 }

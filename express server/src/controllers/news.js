@@ -213,46 +213,36 @@ const deleteNews = async (req = request, res = response) => {
   }
 };
 
-// Obtener comentarios de una noticia
+// Obtener comentarios de una noticia (anidamiento recursivo, ids como string)
 const getComments = async (req = request, res = response) => {
   const { newsId } = req.params;
-  
   try {
     // Verificar si la noticia existe
     const newsExists = await News.findById(newsId);
     if (!newsExists) {
-      return res.status(404).json({
-        msg: 'Noticia no encontrada'
-      });
+      return res.status(404).json({ msg: 'Noticia no encontrada' });
     }
+
+    // Obtener TODOS los comentarios de la noticia (no solo los raíz)
+    const allComments = await Comment.find({ newsId }).sort({ date: 1 });
     
-    // Obtener comentarios principales (sin parentId)
-    const mainComments = await Comment.find({ 
-      newsId,
-      parentId: null
-    }).sort({ date: -1 });
-    
-    // Para cada comentario, obtener sus respuestas
-    const commentsWithReplies = await Promise.all(
-      mainComments.map(async (comment) => {
-        const replies = await Comment.find({ 
-          parentId: comment._id 
-        }).sort({ date: 1 });
-        
-        return {
-          ...comment.toObject(),
-          replies
-        };
-      })
-    );
-    
-    res.json(commentsWithReplies);
-    
+    // Transformar los comentarios para el frontend
+    const transformedComments = allComments.map(comment => ({
+      _id: comment._id.toString(),
+      id: comment._id.toString(),
+      userId: comment.userId.toString(),
+      userName: comment.userName,
+      userImage: comment.userImage,
+      content: comment.content,
+      date: comment.date,
+      parentId: comment.parentId ? comment.parentId.toString() : null,
+      replies: []
+    }));
+
+    res.json(transformedComments);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      msg: 'Error en el servidor'
-    });
+    return res.status(500).json({ msg: 'Error en el servidor' });
   }
 };
 
@@ -292,7 +282,20 @@ const addComment = async (req = request, res = response) => {
     
     await comment.save();
     
-    res.status(201).json(comment);
+    // Transformar el comentario para el frontend
+    const transformedComment = {
+      _id: comment._id.toString(),
+      id: comment._id.toString(),
+      userId: comment.userId.toString(),
+      userName: comment.userName,
+      userImage: comment.userImage,
+      content: comment.content,
+      date: comment.date,
+      parentId: comment.parentId ? comment.parentId.toString() : null,
+      replies: []
+    };
+    
+    res.status(201).json(transformedComment);
     
   } catch (error) {
     console.log(error);
@@ -308,6 +311,13 @@ const updateComment = async (req = request, res = response) => {
   const { content } = req.body;
   
   try {
+    // Validar que el ID sea válido
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({
+        msg: 'ID de comentario no válido'
+      });
+    }
+
     const comment = await Comment.findById(commentId);
     
     if (!comment) {
@@ -327,7 +337,20 @@ const updateComment = async (req = request, res = response) => {
     comment.content = content;
     await comment.save();
     
-    res.json(comment);
+    // Transformar el comentario para el frontend
+    const transformedComment = {
+      _id: comment._id.toString(),
+      id: comment._id.toString(),
+      userId: comment.userId.toString(),
+      userName: comment.userName,
+      userImage: comment.userImage,
+      content: comment.content,
+      date: comment.date,
+      parentId: comment.parentId ? comment.parentId.toString() : null,
+      replies: []
+    };
+    
+    res.json(transformedComment);
     
   } catch (error) {
     console.log(error);
@@ -337,43 +360,46 @@ const updateComment = async (req = request, res = response) => {
   }
 };
 
-// Eliminar un comentario
+// Eliminar un comentario (borrado recursivo, ids como string)
 const deleteComment = async (req = request, res = response) => {
   const { newsId, commentId } = req.params;
-  
   try {
-    const comment = await Comment.findById(commentId);
-    
-    if (!comment) {
-      return res.status(404).json({
-        msg: 'Comentario no encontrado'
-      });
+    // Validar que el ID sea válido
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ msg: 'ID de comentario no válido' });
     }
-    
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comentario no encontrado' });
+    }
+
     // Verificar si el usuario es el autor del comentario o es admin
     if (comment.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({
-        msg: 'No tienes permisos para eliminar este comentario'
-      });
+      return res.status(403).json({ msg: 'No tienes permisos para eliminar este comentario' });
     }
-    
-    // Si es un comentario principal, eliminar también sus respuestas
-    if (!comment.parentId) {
-      await Comment.deleteMany({ parentId: commentId });
+
+    // Función recursiva para borrar todos los descendientes
+    async function deleteDescendants(parentId) {
+      if (!parentId || !mongoose.Types.ObjectId.isValid(parentId)) return;
+      
+      const children = await Comment.find({ parentId });
+      for (const child of children) {
+        await deleteDescendants(child._id.toString());
+        await Comment.findByIdAndDelete(child._id);
+      }
     }
+
+    // Primero eliminar todos los descendientes
+    await deleteDescendants(commentId);
     
-    // Eliminar el comentario
+    // Luego eliminar el comentario principal
     await Comment.findByIdAndDelete(commentId);
     
-    res.json({
-      msg: 'Comentario eliminado correctamente'
-    });
-    
+    res.json({ msg: 'Comentario eliminado correctamente' });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      msg: 'Error en el servidor'
-    });
+    return res.status(500).json({ msg: 'Error en el servidor' });
   }
 };
 

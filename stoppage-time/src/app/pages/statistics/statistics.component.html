@@ -146,7 +146,6 @@
               <tr>
                 <th>#</th>
                 <th class="player-cell-header">Jugador</th>
-                <th>Equipo</th>
                 <th>Goles</th>
                 <th>Asistencias</th>
                 <th>Nacionalidad</th>
@@ -158,10 +157,7 @@
                 <td class="player-cell">
                   <img [src]="player.photo || 'assets/images/placeholder.jpg'" [alt]="player.name" class="player-photo">
                   <span class="player-name">{{ player.name }}</span>
-                </td>
-                <td class="team-small-cell">
-                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-small-logo">
-                  <span class="team-small-name">{{ player.team }}</span>
+                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-logo-inline">
                 </td>
                 <td class="highlight">{{ player.goals }}</td>
                 <td>{{ player.assists }}</td>
@@ -186,7 +182,6 @@
               <tr>
                 <th>#</th>
                 <th class="player-cell-header">Jugador</th>
-                <th>Equipo</th>
                 <th>Asistencias</th>
                 <th>Goles</th>
                 <th>Nacionalidad</th>
@@ -198,10 +193,7 @@
                 <td class="player-cell">
                   <img [src]="player.photo || 'assets/images/placeholder.jpg'" [alt]="player.name" class="player-photo">
                   <span class="player-name">{{ player.name }}</span>
-                </td>
-                <td class="team-small-cell">
-                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-small-logo">
-                  <span class="team-small-name">{{ player.team }}</span>
+                  <img [src]="player.teamLogo || 'assets/images/placeholder.jpg'" [alt]="player.team" class="team-logo-inline">
                 </td>
                 <td class="highlight">{{ player.assists }}</td>
                 <td>{{ player.goals }}</td>

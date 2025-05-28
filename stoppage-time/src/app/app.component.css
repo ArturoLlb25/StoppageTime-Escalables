@@ -214,6 +214,7 @@ main {
   height: 24px;
   position: relative;
   cursor: pointer;
+  margin-right: 60px;
 }
 
 .mobile-menu-button span, 
@@ -311,6 +312,12 @@ main {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu {
+    display: none;
+  }
 }
 
 /* Footer */

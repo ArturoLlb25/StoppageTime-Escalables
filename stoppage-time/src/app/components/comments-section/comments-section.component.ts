@@ -48,7 +48,7 @@ export class CommentsSectionComponent implements OnInit {
   isLoading = true;
   
   newCommentContent = '';
-  replyContent = '';
+  replyContentMap: { [id: string]: string } = {};
   showReplyForm: string | null = null;
   
   editingComment: Comment | null = null;
@@ -75,29 +75,56 @@ export class CommentsSectionComponent implements OnInit {
   
   loadComments(): void {
     if (!this.newsId) return;
-    
     this.isLoading = true;
-    
-    // Seleccionar el endpoint adecuado
     const endpoint = this.isMatchComment 
       ? `${environment.backendUrl}/matches/${this.newsId.substring(6)}/comments`
       : `${environment.backendUrl}/news/${this.newsId}/comments`;
     
-    this.http.get<Comment[]>(endpoint).subscribe(
-      comments => {
-        this.comments = comments || [];
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error al cargar comentarios:', error);
-        this.comments = [];
-        this.isLoading = false;
-        this.snackBar.open('Error al cargar comentarios', 'Cerrar', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
+    this.http.get<Comment[]>(endpoint).subscribe(commentsFlat => {
+      console.log('Comentarios recibidos del backend:', commentsFlat);
+      // Asegura IDs y limpia replies
+      commentsFlat.forEach(c => {
+        if (c._id) c.id = c._id.toString();
+        (c as any).replies = [];
+      });
+
+      // Mapeo por id
+      const commentMap: { [id: string]: Comment & { replies: Comment[] } } = {};
+      commentsFlat.forEach(c => {
+        if (c.id) commentMap[c.id] = c as any;
+      });
+
+      // Anidar hasta 2 niveles de respuestas (respuesta y subrespuesta)
+      commentsFlat.forEach(comment => {
+        if (comment.parentId && commentMap[comment.parentId]) {
+          commentMap[comment.parentId].replies.push(comment as any);
+        }
+      });
+
+      // Solo los comentarios raíz (sin parentId)
+      // Para cada respuesta, solo deja subrespuestas en su .replies
+      this.comments = commentsFlat
+        .filter(c => !c.parentId)
+        .map(c => {
+          // Solo un nivel de replies (respuestas directas)
+          c.replies = (c.replies || []).map(reply => {
+            // Solo un nivel de subreplies (subrespuestas directas)
+            reply.replies = (reply.replies || []);
+            return reply;
+          });
+          return c;
         });
-      }
-    );
+
+      this.isLoading = false;
+    }, error => {
+      console.error('Error al cargar comentarios:', error);
+      this.comments = [];
+      this.isLoading = false;
+      this.snackBar.open('Error al cargar comentarios', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    });
   }
   
   submitNewComment(): void {
@@ -134,32 +161,38 @@ export class CommentsSectionComponent implements OnInit {
   
   toggleReplyForm(commentId: string): void {
     this.showReplyForm = this.showReplyForm === commentId ? null : commentId;
-    this.replyContent = '';
+    this.replyContentMap[commentId] = '';
     this.cancelEdit();
   }
   
   submitReply(parentId: string): void {
-    if (!this.replyContent.trim() || !this.isLoggedIn) return;
-    
+    const replyContent = this.replyContentMap[parentId] || '';
+    if (!replyContent.trim() || !this.isLoggedIn) return;
     const endpoint = this.isMatchComment 
       ? `${environment.backendUrl}/matches/${this.newsId.substring(6)}/comments`
       : `${environment.backendUrl}/news/${this.newsId}/comments`;
-    
     this.http.post<Comment>(endpoint, {
-      content: this.replyContent,
+      content: replyContent,
       parentId
     }).subscribe(
       reply => {
-        // Encontrar el comentario padre y añadir la respuesta
-        const parentComment = this.comments.find(c => c.id === parentId);
+        let parentComment = this.comments.find(c => c.id === parentId);
         if (parentComment) {
-          if (!parentComment.replies) {
-            parentComment.replies = [];
-          }
+          if (!parentComment.replies) parentComment.replies = [];
           parentComment.replies.push(reply);
+        } else {
+          for (const comment of this.comments) {
+            if (comment.replies) {
+              const parentReply = comment.replies.find(r => r.id === parentId);
+              if (parentReply) {
+                if (!parentReply.replies) parentReply.replies = [];
+                parentReply.replies.push(reply);
+                break;
+              }
+            }
+          }
         }
-        
-        this.replyContent = '';
+        this.replyContentMap[parentId] = '';
         this.showReplyForm = null;
         this.snackBar.open('Respuesta publicada', 'Cerrar', {
           duration: 3000,
@@ -178,17 +211,26 @@ export class CommentsSectionComponent implements OnInit {
   
   cancelReply(): void {
     this.showReplyForm = null;
-    this.replyContent = '';
   }
   
   startEditComment(comment: Comment): void {
+    if (!comment || !comment.id) {
+      console.error('Comentario inválido:', comment);
+      return;
+    }
     this.editingComment = comment;
     this.editContent = comment.content;
     this.showReplyForm = null;
   }
   
   submitEdit(): void {
-    if (!this.editContent.trim() || !this.editingComment) return;
+    if (!this.editContent.trim() || !this.editingComment || !this.editingComment.id) {
+      console.error('Datos de edición inválidos:', { 
+        content: this.editContent, 
+        comment: this.editingComment 
+      });
+      return;
+    }
     
     this.newsService.updateComment(
       this.newsId, 
@@ -196,7 +238,6 @@ export class CommentsSectionComponent implements OnInit {
       this.editContent
     ).subscribe(
       updatedComment => {
-        // Actualizar el comentario en la lista
         this.updateCommentInList(updatedComment);
         this.cancelEdit();
         this.snackBar.open('Comentario actualizado', 'Cerrar', {
@@ -220,10 +261,18 @@ export class CommentsSectionComponent implements OnInit {
   }
   
   deleteComment(commentId: string): void {
+    if (!commentId || commentId === 'undefined') {
+      console.error('ID de comentario inválido:', commentId);
+      this.snackBar.open('Error: ID de comentario no válido', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
     if (confirm('¿Estás seguro de que deseas eliminar este comentario?')) {
       this.newsService.deleteComment(this.newsId, commentId).subscribe(
         () => {
-          // Remover el comentario de la lista
           this.removeCommentFromList(commentId);
           this.snackBar.open('Comentario eliminado', 'Cerrar', {
             duration: 3000,
@@ -253,6 +302,8 @@ export class CommentsSectionComponent implements OnInit {
   }
   
   private updateCommentInList(updatedComment: Comment): void {
+    if (!updatedComment || !updatedComment.id) return;
+
     // Buscar si es un comentario principal
     const index = this.comments.findIndex(c => c.id === updatedComment.id);
     if (index !== -1) {
@@ -260,19 +311,33 @@ export class CommentsSectionComponent implements OnInit {
       return;
     }
     
-    // Buscar si es una respuesta
+    // Buscar en respuestas y subrespuestas
     for (const comment of this.comments) {
       if (comment.replies) {
+        // Buscar en respuestas directas
         const replyIndex = comment.replies.findIndex(r => r.id === updatedComment.id);
         if (replyIndex !== -1) {
           comment.replies[replyIndex].content = updatedComment.content;
           return;
+        }
+        
+        // Buscar en subrespuestas
+        for (const reply of comment.replies) {
+          if (reply.replies) {
+            const subReplyIndex = reply.replies.findIndex(r => r.id === updatedComment.id);
+            if (subReplyIndex !== -1) {
+              reply.replies[subReplyIndex].content = updatedComment.content;
+              return;
+            }
+          }
         }
       }
     }
   }
   
   private removeCommentFromList(commentId: string): void {
+    if (!commentId || commentId === 'undefined') return;
+
     // Verificar si es un comentario principal
     const index = this.comments.findIndex(c => c.id === commentId);
     if (index !== -1) {
@@ -280,13 +345,25 @@ export class CommentsSectionComponent implements OnInit {
       return;
     }
     
-    // Verificar si es una respuesta
+    // Verificar en respuestas y subrespuestas
     for (const comment of this.comments) {
       if (comment.replies) {
+        // Buscar en respuestas directas
         const replyIndex = comment.replies.findIndex(r => r.id === commentId);
         if (replyIndex !== -1) {
           comment.replies.splice(replyIndex, 1);
           return;
+        }
+        
+        // Buscar en subrespuestas
+        for (const reply of comment.replies) {
+          if (reply.replies) {
+            const subReplyIndex = reply.replies.findIndex(r => r.id === commentId);
+            if (subReplyIndex !== -1) {
+              reply.replies.splice(subReplyIndex, 1);
+              return;
+            }
+          }
         }
       }
     }
