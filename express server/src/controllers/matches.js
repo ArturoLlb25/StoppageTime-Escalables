@@ -1,4 +1,4 @@
-// En src/controllers/matches.js (modificar el existente)
+
 const { response, request } = require('express');
 const axios = require('axios');
 const Match = require('../models/match');
@@ -7,10 +7,10 @@ const MatchComment = require('../models/matchComments');
 // Función para obtener partidos de la API y guardarlos en la BD
 const fetchAndUpdateMatches = async () => {
   try {
-    // Verificar si ya se actualizó hoy
+    // Verifica si ya se actualizó hoy
     const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
     
-    // Buscar el partido más reciente para verificar si ya se actualizó hoy
+    // Busca el partido más reciente para verificar si ya se actualizó hoy
     const lastUpdated = await Match.findOne().sort({ lastUpdated: -1 });
     
     // Si se actualizó hoy, no hacemos nada
@@ -41,7 +41,7 @@ const fetchAndUpdateMatches = async () => {
       const limitedFixtures = fixtures.slice(0, 20);
       
       for (const fixture of limitedFixtures) {
-        // Mapear datos de la API a nuestro modelo
+        // Mapeo datos de la API a nuestro modelo
         const matchData = {
           apiId: fixture.fixture.id,
           date: fixture.fixture.date.split('T')[0],
@@ -75,7 +75,7 @@ const fetchAndUpdateMatches = async () => {
           lastUpdated: new Date()
         };
         
-        // Usar upsert para actualizar si existe o crear si no
+        // upsert para actualizar si existe o crear si no
         await Match.findOneAndUpdate(
           { apiId: matchData.apiId }, 
           matchData, 
@@ -118,14 +118,14 @@ const mapApiStatus = (apiStatus) => {
 // Obtener todos los partidos
 const getMatches = async (req = request, res = response) => {
   try {
-    // Asegurarse de que los datos estén actualizados
+    // Asegura que los datos estén actualizados
     await fetchAndUpdateMatches();
     
     // Obtener todos los partidos para hoy
     const today = new Date().toISOString().split('T')[0];
     const matches = await Match.find({ date: today }).sort({ 'score.home': -1, 'time': 1 });
     
-    // Transformar a formato esperado por el frontend
+    // Transforma a formato esperado por el frontend
     const formattedMatches = matches.map(match => ({
       id: match.apiId,
       date: match.date,

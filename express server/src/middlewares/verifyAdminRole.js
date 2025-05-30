@@ -1,4 +1,4 @@
-// En middlewares/verifyAdminRole.js
+
 const { response, request } = require('express');
 
 const verifyAdminRole = (req = request, res = response, next) => {

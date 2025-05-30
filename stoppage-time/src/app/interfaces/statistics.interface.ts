@@ -1,4 +1,3 @@
-// src/app/interfaces/statistics.interface.ts
 export interface LeagueStanding {
   rank: number;
   teamId: number;

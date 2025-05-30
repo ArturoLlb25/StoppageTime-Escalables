@@ -1,4 +1,3 @@
-// En src/app/pages/matches/matches.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

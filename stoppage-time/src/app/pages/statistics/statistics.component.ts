@@ -1,4 +1,3 @@
-// src/app/pages/statistics/statistics.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

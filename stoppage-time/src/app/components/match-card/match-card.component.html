@@ -1,4 +1,4 @@
-<!-- src/app/components/match-card/match-card.component.html -->
+
 <div class="match-card" [ngClass]="{'live': match.status === 'LIVE','azul':match.status!=='LIVE'}" [routerLink]="['/matches', match.id]">
   <div class="match-status">
     <span *ngIf="match.status === 'LIVE'" class="status-live">EN VIVO</span>

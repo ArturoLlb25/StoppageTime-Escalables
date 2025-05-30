@@ -1,4 +1,3 @@
-// In src/config/server.js - update to include statistics routes
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./database');
@@ -15,7 +14,7 @@ class Server {
     this.newsPath = '/api/news';
     this.usersPath = '/api/users';
     this.matchesPath = '/api/matches';
-    this.statisticsPath = '/api/statistics'; // New path for statistics
+    this.statisticsPath = '/api/statistics'; 
 
     // Middlewares
     this.app.use(cors());
@@ -24,10 +23,10 @@ class Server {
     // Conexión a la base de datos
     connectDB();
 
-    // Definir rutas
+    // Rutas
     this.routes();
     
-    // Iniciar actualizaciones programadas
+    // Actualizaciones periodicas
     scheduleMatchUpdates();
     scheduleStatisticsUpdates(); // Schedule statistics updates
   }
@@ -37,7 +36,7 @@ class Server {
     this.app.use(this.newsPath, require("../routes/news"));
     this.app.use(this.usersPath, require("../routes/users"));
     this.app.use(this.matchesPath, require("../routes/matches"));
-    this.app.use(this.statisticsPath, require("../routes/statistics")); // Add statistics routes
+    this.app.use(this.statisticsPath, require("../routes/statistics")); // 
   }
 
   listen() {

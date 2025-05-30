@@ -154,7 +154,6 @@
   font-size: 0.9rem;
 }
 
-/* En src/app/components/match-card/match-card.component.css */
 .status-scheduled {
   color: var(--color-secondary);
   font-weight: 500;
@@ -166,7 +165,6 @@
   display: block;
 }
 
-/* Aumentamos la altura máxima para acomodar más texto */
 .match-card {
   height: auto;
   min-height: 170px;

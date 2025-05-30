@@ -1,4 +1,3 @@
-// En src/routes/matches.js
 const { Router } = require('express');
 const { verifyJWT } = require('../middlewares/verifyJWT');
 const { 

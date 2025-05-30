@@ -1,10 +1,8 @@
-// src/controllers/statistics.js
 const { response, request } = require('express');
 const axios = require('axios');
 const Statistics = require('../models/statistics');
 require('dotenv').config();
 
-// Supported leagues for statistics
 const SUPPORTED_LEAGUES = [
   { id: 39, name: 'Premier League', country: 'England' },
   { id: 140, name: 'La Liga', country: 'Spain' },
@@ -13,17 +11,17 @@ const SUPPORTED_LEAGUES = [
   { id: 61, name: 'Ligue 1', country: 'France' }
 ];
 
-// Season to use (due to API limitations in free tier)
+
 const SEASON = 2023;
 
-// API configuration
+
 const API_KEY = process.env.FOOTBALL_API_KEY;
 const API_HOST = 'v3.football.api-sports.io';
 
-// Log API key status (without exposing the full key)
+
 console.log('API Key status:', API_KEY ? `Present (${API_KEY.substring(0, 4)}...)` : 'Missing');
 
-// Function to fetch league standings from the API
+
 const fetchLeagueStandings = async (leagueId, season) => {
   try {
     console.log(`Making request to API for league ${leagueId} with headers:`, {
@@ -51,7 +49,7 @@ const fetchLeagueStandings = async (leagueId, season) => {
       return [];
     }
 
-    // Extract standings from response
+    
     const standings = response.data.response[0].league.standings[0].map(standing => ({
       rank: standing.rank,
       teamId: standing.team.id,

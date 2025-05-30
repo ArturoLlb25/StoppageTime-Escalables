@@ -1,4 +1,3 @@
-// En src/app/components/match-card/match-card.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';

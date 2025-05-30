@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const bcrypt = require('bcrypt'); // Añade esta importación
+const bcrypt = require('bcrypt'); 
 const User = require('../models/user');
 const mongoose = require('mongoose');
 

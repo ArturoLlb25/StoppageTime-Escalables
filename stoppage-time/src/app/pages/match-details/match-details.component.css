@@ -427,3 +427,10 @@
     padding: 1.5rem 1rem;
   }
 }
+
+.espacio{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 2rem;
+  font-weight: bold;
+}
