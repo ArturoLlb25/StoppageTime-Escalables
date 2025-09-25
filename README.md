@@ -33,4 +33,7 @@ El proyecto busca crear una experiencia digital donde los fanáticos del fútbol
 - Crea un archivo .env en backend/ con la cadena de conexión
  
 ### Equipo de desarollo: Llanas Banda Arturo y Cortez Muñoz Manuel
+
+![Imagen](/imagen1.png)
+![Imagen](/imagen2.png)
   
